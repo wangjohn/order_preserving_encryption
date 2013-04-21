@@ -53,10 +53,15 @@ class ClientMessage(MessageProtocol)
         self.ciphertext = ciphertext
         self.new_ciphertext = new_ciphertext
         self.insert_direction = insert_direction
+        self._check_insert_direction()
 
     def query(self, ciphertext):
         self.message_type = MessageType("query")
         self.ciphertext = ciphertext
+
+    def _check_insert_direction(self):
+        if not (self.insert_direction == 'left' or self.insert_direction == 'right'):
+           raise Exception("'%s' is not a valid insert direction" % self.insert_direction)
 
 # Class that wraps valid message types that are passed from the client to the
 # server. It contains a whitelist of valid message types. Checking the type of
