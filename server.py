@@ -5,10 +5,10 @@ class Server:
     A node in the OPE Tree
     '''
     class OPE_Node:
-        def __init__(v):
-            value = v
-            left = None
-            right = None
+        def __init__(self, v):
+            self.value = v
+            self.left = None
+            self.right = None
 
     '''
     A dumb ML algo that learns something from a message and is able to 
@@ -18,38 +18,61 @@ class Server:
 
         # maintains the state
         class State:
-            def __init__():
-                count = 0
+            def __init__(self):
+                self.count = 0
 
-        def __init__():
-            state = State()
+        def __init__(self):
+            self.state = State()
 
         # updates state based on message
-        def process_message(message):
-            state.count += 1 
+        def process_message(self, client_message):
+            self.state.count += 1 
 
         # possibilities: NONE, INCREASING, DECREASING, RANDOM
-        def get_recommendation():
-            if (state.count == 0):
+        def get_recommendation(self):
+            if (self.state.count == 0):
                 return "NONE"
             else:
                 return "INCREASING"
 
-    def __init__():
-        OPE_table = {}
-        learner = MachineLearner()
+    def __init__(self):
+        self.ope_table = {} 
+        
+        # use fake ope table for now -- instead of storing the OPE path, 
+        # we store pointers to the node directly 
+        self.fake_ope_table = {} 
+        self.root = Node()
+        self.learner = MachineLearner()
 
-    def receive(message):
-        learner.process_message(message)
 
-    def pad(value):
+    def receive(self, client_message):
+        self.learner.process_message(client_message)
+
+        if (client_message.message_type == "move_left"):
+            left_child = self.fake_ope_table[client_message.ciphertext]
+            return left_child.ciphertext
+
+        elif (client_message.message_type == "move_right"):
+            right_child = self.fake_ope_table[client_message.ciphertext]
+            return right_child.ciphertext
+
+        elif (client_message.message_type == "get_root"):
+            return self.root
+
+        elif (client_message.message_type == "insert"):
+            client_message.ciphertext
+
+
+
+
+    def pad(self, value):
         if (len(value) < ENC_LEN):
             value += "1"
         while (len(value) < ENC_LEN):
             value += "0"
         return value
 
-    def unpad(value):
+    def unpad(self, value):
         r = value.rfind("1")
         return value[:r]
 

@@ -7,7 +7,7 @@ class MessageProtocol:
         self.receiver = receiver
 
 # Message which the server sends to the client. Must contain a ciphertext.
-class SeverMessage(MessageProtocol)
+class ServerMessage(MessageProtocol)
     def __init__(self, sender, receiver, ciphertext):
         MessageProtocol.__init__(self, sender, receiver)
         self.ciphertext = ciphertext
