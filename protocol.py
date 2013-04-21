@@ -34,6 +34,7 @@ class ClientMessage(MessageProtocol)
         MessageProtocol.__init__(self, sender, receiver)
         self.message_type = None
         self.ciphertext = None
+        self.new_ciphertext = None
         self.insert_direction = None
 
     def move_left(self, ciphertext):
@@ -47,9 +48,10 @@ class ClientMessage(MessageProtocol)
     def get_root(self):
         self.message_type = MessageType("get_root")
 
-    def insert(self, ciphertext, insert_direction):
+    def insert(self, ciphertext, new_ciphertext, insert_direction):
         self.message_type = MessageType("insert")
         self.ciphertext = ciphertext
+        self.new_ciphertext = new_ciphertext
         self.insert_direction = insert_direction
 
     def query(self, ciphertext):
