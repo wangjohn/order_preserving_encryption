@@ -53,12 +53,12 @@ class MessageType:
     valid_message_types = ["move_left", "move_right", "get_root", "insert"]
 
     def __init__(self, message_type):
-        self._check_valid_message_type(message_type)
         self._message_type = message_type
+        self._check_valid_message_type()
 
     def type(self):
         self._message_type
 
-    def _check_valid_message_type(self, message_type)
-        if message_type not in valid_message_types:
+    def _check_valid_message_type(self)
+        if self.message_type not in valid_message_types:
             raise Exception("'%s' is not a valid message type" % message_type)
