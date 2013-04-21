@@ -1,8 +1,7 @@
 class Server:
-    ENC_LEN = 32 # for padding
 
     '''
-    A node in the OPE Tree
+    A node in the OPE tree
     '''
     class OPE_Node:
         def __init__(self, v):
@@ -37,7 +36,6 @@ class Server:
 
     def __init__(self):
         self.ope_table = {} 
-        
         # use fake ope table for now -- instead of storing the OPE path, 
         # we store pointers to the node directly 
         self.fake_ope_table = {} 
@@ -71,6 +69,13 @@ class Server:
             self.fake_ope_table[client_message.new_ciphertext] = new_node
             return ServerMessage(ciphertext=new_node.new_ciphertext, client_message=client_message)
 
+        elif (client_message.message_type == "query"):
+            # trivial implementation since there is no data associated with a ciphertext besides itself
+            return ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
+
+    '''
+    ENC_LEN = 32 # for padding
+
     def pad(self, value):
         if (len(value) < ENC_LEN):
             value += "1"
@@ -81,4 +86,4 @@ class Server:
     def unpad(self, value):
         r = value.rfind("1")
         return value[:r]
-
+    '''
