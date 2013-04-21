@@ -20,7 +20,7 @@ class CommunicationFactory:
     def build_for(self, build_type):
         if build_type == "client":
             return CommunicationChannel(self.client_to_server, self.server_to_client)
-        else if build_type == "server":
+        elif build_type == "server":
             return CommunicationChannel(self.server_to_client, self.client_to_server)
         else:
             raise Exception("Cannot build communication channel for %s." % build_type)
