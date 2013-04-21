@@ -21,6 +21,7 @@ class SeverMessage(MessageProtocol)
 #   move_right
 #   get_root
 #   insert
+#   query
 #
 # Once one of these messages is called, the message will be automatically
 # configured with the correct +MessageType+
@@ -47,11 +48,15 @@ class ClientMessage(MessageProtocol)
         self.ciphertext = ciphertext
         self.insert_direction = insert_direction
 
+    def query(self, ciphertext):
+        self.message_type = MessageType("query")
+        self.ciphertext = ciphertext
+
 # Class that wraps valid message types that are passed from the client to the
 # server. It contains a whitelist of valid message types. Checking the type of
 # the object is as easy as checking +type+ on the object.
 class MessageType:
-    valid_message_types = ["move_left", "move_right", "get_root", "insert"]
+    valid_message_types = ["move_left", "move_right", "get_root", "insert", "query"]
 
     def __init__(self, message_type):
         self._message_type = message_type
