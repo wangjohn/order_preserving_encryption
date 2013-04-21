@@ -8,3 +8,6 @@ class BasicEncryptionScheme:
 
     def decrypt(self, key, ciphertext):
         return message
+
+    def generate_key(self):
+        return "I'm in da hooooood! bitches"

@@ -4,15 +4,13 @@ import uuid
 # server. The MessageProtocol object itself is abstract and should never be
 # initialized.
 class MessageProtocol:
-    def __init__(self, sender, receiver):
+    def __init__(self):
         self.uuid = uuid.uuid4() # generates a random universally unique ID.
-        self.sender = sender
-        self.receiver = receiver
 
 # Message which the server sends to the client. Must contain a ciphertext.
 class SeverMessage(MessageProtocol)
-    def __init__(self, sender, receiver, ciphertext, client_message):
-        MessageProtocol.__init__(self, sender, receiver)
+    def __init__(self, ciphertext, client_message):
+        MessageProtocol.__init__(self)
         self.ciphertext = ciphertext
         self.client_message = client_message
 
@@ -30,8 +28,8 @@ class SeverMessage(MessageProtocol)
 # Once one of these messages is called, the message will be automatically
 # configured with the correct +MessageType+
 class ClientMessage(MessageProtocol)
-    def __init__(self, sender, receiver):
-        MessageProtocol.__init__(self, sender, receiver)
+    def __init__(self):
+        MessageProtocol.__init__(self)
         self.message_type = None
         self.ciphertext = None
         self.new_ciphertext = None
