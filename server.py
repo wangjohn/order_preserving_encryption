@@ -63,16 +63,24 @@ class Server:
                 return ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type == "get_root"):
+            if not self.root:
+                return ServerMessage(ciphertext=None, client_message=client_message)
             return ServerMessage(ciphertext=self.root.ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "insert"):
-            node = self.fake_ope_table[client_message.ciphertext]
             new_node = OPE_Node(client_message.new_ciphertext)
-            if (client_message.insert_direction == "left"):
-                node.left = new_node
-            elif (client_message.insert_direction == "right"):
-                node.right = new_node
-            self.fake_ope_table[client_message.new_ciphertext] = new_node
+            #handle root case
+            if client_message.ciphertext == None:
+                root = new_node
+                self.fake_ope_table[client_message.new_ciphertext] = root
+            else:
+                node = self.fake_ope_table[client_message.ciphertext]
+                
+                if (client_message.insert_direction == "left"):
+                    node.left = new_node
+                elif (client_message.insert_direction == "right"):
+                    node.right = new_node
+                self.fake_ope_table[client_message.new_ciphertext] = new_node
             return ServerMessage(ciphertext=new_node.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "query"):
