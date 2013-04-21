@@ -1,8 +1,4 @@
-
-
-
 class Server:
-
     ENC_LEN = 32 # for padding
 
     '''
@@ -39,15 +35,12 @@ class Server:
             else:
                 return "INCREASING"
 
-
     def __init__():
         OPE_table = {}
         learner = MachineLearner()
 
-
     def receive(message):
         learner.process_message(message)
-        
 
     def pad(value):
         if (len(value) < ENC_LEN):
