@@ -1,8 +1,11 @@
+import uuid
+
 # This is the baseline protocol for communication between the client and the
 # server. The MessageProtocol object itself is abstract and should never be
 # initialized.
 class MessageProtocol:
     def __init__(self, sender, receiver):
+        self.uuid = uuid.uuid4() # generates a random universally unique ID.
         self.sender = sender
         self.receiver = receiver
 
@@ -31,6 +34,7 @@ class ClientMessage(MessageProtocol)
         MessageProtocol.__init__(self, sender, receiver)
         self.message_type = None
         self.ciphertext = None
+        self.new_ciphertext = None
         self.insert_direction = None
 
     def move_left(self, ciphertext):
@@ -44,14 +48,20 @@ class ClientMessage(MessageProtocol)
     def get_root(self):
         self.message_type = MessageType("get_root")
 
-    def insert(self, ciphertext, insert_direction):
+    def insert(self, ciphertext, new_ciphertext, insert_direction):
         self.message_type = MessageType("insert")
         self.ciphertext = ciphertext
+        self.new_ciphertext = new_ciphertext
         self.insert_direction = insert_direction
+        self._check_insert_direction()
 
     def query(self, ciphertext):
         self.message_type = MessageType("query")
         self.ciphertext = ciphertext
+
+    def _check_insert_direction(self):
+        if not (self.insert_direction == 'left' or self.insert_direction == 'right'):
+           raise Exception("'%s' is not a valid insert direction" % self.insert_direction)
 
 # Class that wraps valid message types that are passed from the client to the
 # server. It contains a whitelist of valid message types. Checking the type of
