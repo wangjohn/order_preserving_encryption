@@ -1,8 +1,11 @@
+import uuid
+
 # This is the baseline protocol for communication between the client and the
 # server. The MessageProtocol object itself is abstract and should never be
 # initialized.
 class MessageProtocol:
     def __init__(self, sender, receiver):
+        self.uuid = uuid.uuid4() # generates a random universally unique ID.
         self.sender = sender
         self.receiver = receiver
 
