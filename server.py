@@ -41,29 +41,35 @@ class Server:
         # use fake ope table for now -- instead of storing the OPE path, 
         # we store pointers to the node directly 
         self.fake_ope_table = {} 
-        self.root = Node()
+        self.root = OPE_Node()
         self.learner = MachineLearner()
 
-
+    '''
+    Server response to a client message.
+    '''
     def receive(self, client_message):
         self.learner.process_message(client_message)
 
         if (client_message.message_type == "move_left"):
             left_child = self.fake_ope_table[client_message.ciphertext]
-            return left_child.ciphertext
+            return ServerMessage(ciphertext=left_child.ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "move_right"):
             right_child = self.fake_ope_table[client_message.ciphertext]
-            return right_child.ciphertext
+            return ServerMessage(ciphertext=right_child.ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "get_root"):
-            return self.root
+            return ServerMessage(ciphertext=self.root.ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "insert"):
-            client_message.ciphertext
-
-
-
+            node = self.fake_ope_table[client_message.ciphertext]
+            new_node = OPE_Node(client_message.new_ciphertext)
+            if (client_message.insert_direction == "left"):
+                node.left = new_node
+            elif (client_message.insert_direction == "right"):
+                node.right = new_node
+            self.fake_ope_table[client_message.new_ciphertext] = new_node
+            return ServerMessage(ciphertext=new_node.new_ciphertext, client_message=client_message)
 
     def pad(self, value):
         if (len(value) < ENC_LEN):
