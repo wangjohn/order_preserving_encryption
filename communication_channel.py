@@ -4,15 +4,14 @@ import Queue
 # and the client.
 #
 # You can put/get messages from the queue whenever you are ready for them.
-class CommunicationQueue:
-    def __init__(self, sender, receiver):
-        self.sender = sender
-        self.receiver = receiver
-        self.messages = Queue.Queue()
+class CommunicationChannel:
+    def __init__(self, send_queue, receive_queue):
+        self._send_queue = send_queue
+        self._receive_queue = receive_queue
 
     def put(self, message):
         message.message_type._check_valid_message_type()
-        self.messages.put(message)
+        self._send_queue.put(message)
 
     def get(self):
-        self.messages.get()
+        self._receive_queue.get()
