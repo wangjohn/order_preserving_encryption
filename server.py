@@ -49,12 +49,18 @@ class Server:
         self.learner.process_message(client_message)
 
         if (client_message.message_type == "move_left"):
-            left_child = self.fake_ope_table[client_message.ciphertext]
-            return ServerMessage(ciphertext=left_child.ciphertext, client_message=client_message)
+            left_child = self.fake_ope_table[client_message.ciphertext].left
+            if left_child:
+                return ServerMessage(ciphertext=left_child.ciphertext, client_message=client_message)
+            else:
+                return ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type == "move_right"):
-            right_child = self.fake_ope_table[client_message.ciphertext]
-            return ServerMessage(ciphertext=right_child.ciphertext, client_message=client_message)
+            right_child = self.fake_ope_table[client_message.ciphertext].right
+            if right_child:
+                return ServerMessage(ciphertext=right_child.ciphertext, client_message=client_message)
+            else:
+                return ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type == "get_root"):
             return ServerMessage(ciphertext=self.root.ciphertext, client_message=client_message)
