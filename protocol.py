@@ -44,6 +44,7 @@ class ClientMessage(MessageProtocol)
 
     def insert(self, ciphertext, insert_direction):
         self.message_type = MessageType("insert")
+        self.ciphertext = ciphertext
         self.insert_direction = insert_direction
 
 # Class that wraps valid message types that are passed from the client to the
