@@ -8,9 +8,10 @@ class MessageProtocol:
 
 # Message which the server sends to the client. Must contain a ciphertext.
 class SeverMessage(MessageProtocol)
-    def __init__(self, sender, receiver, ciphertext):
+    def __init__(self, sender, receiver, ciphertext, client_message):
         MessageProtocol.__init__(self, sender, receiver)
         self.ciphertext = ciphertext
+        self.client_message = client_message
 
 # Message which the client sends to the server.
 #
