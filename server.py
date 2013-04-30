@@ -160,6 +160,7 @@ class Server:
     '''
     rebalance.heights will return the subtree_sizes of every rebalance,
     allowing us to figure out the speed of our insertion procedure.
+    len(rebalance.heights) is the number of rebalances.
     '''
     @counter 
     def rebalance(node):
