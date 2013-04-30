@@ -1,0 +1,37 @@
+
+\begin{document}
+
+\section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
+
+This security definition consists of two phases of interaction between the adversary and the challenger.
+
+In phase I:
+\begin{itemize}
+  \item Client generates $SK \leftarrow KeyGen(1^\kappa)$ based on security parameter $\kappa$.
+  \item Adversary may perform encryptions and other operations in time $poly(\kappa)$.
+\end{itemize}
+
+In phase II, the client and server engage in $poly(\kappa)$ rounds of interaction in which the adversary is adaptive. In each round $i$:
+\begin{itemize}
+  \item Adversary sends sequences $V_i^0, V_i^1 \in D^{\lambda}$ to the client each of size $\lambda$, where $\lambda$ is a fixed value, and $V_i = \{ v_{ij} \}_i^{\lambda}$ where $v_{ij}$ is the $j$th value chosen for round $i$.
+  \item The client leads the interaction for the encryption algorithm on inputs $SK$ and $V_i^b$ with the server, with the adversary observing all the state at the server.
+\end{itemize}
+
+In phase III:
+\begin{itemize}
+  \item Adversary obtains $poly(\lambda, \kappa)$ time to compute.
+  \item Adversary outputs $b'$ as its guess for $b$. 
+\end{itemize}
+
+The adversary shall win the game if its guess is correct $b' = b$ and the sets have the same order relations (namely that $v_{ij}^0 < v_{ik}^0 \Leftrightarow v_{ij}^1 < v_{ik}^1$).
+
+Definition: IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
+
+Security Proof:
+We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sets of size $\lambda$.
+
+We will show this by induction on the number of repeated elements in either $V_i$ or $W_i$. We shall first consider the base case when there are no repeated elements in $V_i$ or in $W_i$, so that all the elements in $V_i$ are distinct, as well as the elements in $W_i$. In this case, the sequence $v$ can be broken down into $\kappa$ sequences of all distinct elements. This has a clear bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) shows that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. This means that the DCS scheme is IND-CPDA secure when there are no repeated elements.
+
+Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure.
+
+\end{document}
