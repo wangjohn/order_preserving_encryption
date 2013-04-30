@@ -104,6 +104,28 @@ class Server:
     the time taken for each rebalance is proportional to the height of the subtree
     rooted at that node.
     '''
+
+    def subtree_size(node):
+        if node is None:
+            return 0
+        if node.left is None and node.right is None:
+            return 1
+        elif node.left is None:
+            return 1 + subtree_size(node.right)
+        elif node.right is None:
+            return 1 + subtree_size(node.left)
+        else:
+            return 1 + sum[subtree_size(node.left), subtree_size(node.right)] 
+
+    def counter(fn):
+        def wrapper(*args, **kwargs):
+            for arg in args:
+                subtree_sizes += [subtree_size(node)]
+            return fn(*args, **kwargs)
+        wrapper.subtree_sizes = []
+        wrapper.__name__ = fn.__name__
+        return wrapper
+
     def height(node):
         if node is None:
             return 0
@@ -135,6 +157,11 @@ class Server:
         A.left = B.right
         B.right = A
 
+    '''
+    rebalance.heights will return the subtree_sizes of every rebalance,
+    allowing us to figure out the speed of our insertion procedure.
+    '''
+    @counter 
     def rebalance(node):
         if balance_factor(node) == -2:
             if balance_factor(node.right) == -1: # right-right case
