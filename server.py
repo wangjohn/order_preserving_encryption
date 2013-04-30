@@ -98,6 +98,11 @@ class Server:
     In our implementation, because we use a fake_ope_table with pointers to 
     the nodes, this procedure doesn't take very long. However, in CryptDB, 
     this procedure is the very time-consuming.
+
+    Specifically, we count two things: 1) the number of rebalance operations
+    and 2) the subtree size at each rebalanced node. This is because in CryptDB,
+    the time taken for each rebalance is proportional to the height of the subtree
+    rooted at that node.
     '''
     def height(node):
         if node is None:
