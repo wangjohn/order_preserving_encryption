@@ -8,6 +8,8 @@ class Server:
             self.value = v
             self.left = None
             self.right = None
+            self.count = 1
+            self.parent = None
 
     '''
     A dumb ML algo that learns something from a message and is able to 
@@ -69,18 +71,22 @@ class Server:
 
         elif (client_message.message_type == "insert"):
             new_node = OPE_Node(client_message.new_ciphertext)
-            #handle root case
+            # root case
             if client_message.ciphertext == None:
                 root = new_node
                 self.fake_ope_table[client_message.new_ciphertext] = root
             else:
                 node = self.fake_ope_table[client_message.ciphertext]
-                
+                new_node.parent = node
                 if (client_message.insert_direction == "left"):
                     node.left = new_node
                 elif (client_message.insert_direction == "right"):
                     node.right = new_node
                 self.fake_ope_table[client_message.new_ciphertext] = new_node
+            # AVL rebalance
+            while (node.parent != None)
+                rebalance(node.parent)
+                node = node.parent 
             return ServerMessage(ciphertext=new_node.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type == "query"):
@@ -88,16 +94,59 @@ class Server:
             return ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
 
     '''
-    ENC_LEN = 32 # for padding
-
-    def pad(self, value):
-        if (len(value) < ENC_LEN):
-            value += "1"
-        while (len(value) < ENC_LEN):
-            value += "0"
-        return value
-
-    def unpad(self, value):
-        r = value.rfind("1")
-        return value[:r]
+    These functions handle a rebalance of the tree upon insertion of a node. 
+    In our implementation, because we use a fake_ope_table with pointers to 
+    the nodes, this procedure doesn't take very long. However, in CryptDB, 
+    this procedure is the very time-consuming.
     '''
+    def height(node):
+        if node is None:
+            return 0
+        if node.left is None and node.right is None:
+            return 1
+        elif node.left is None:
+            return 1 + height(node.right)
+        elif node.right is None:
+            return 1 + height(node.left)
+        else:
+            return 1 + max(height(node.left), height(node.right))
+
+    def balance_factor(node):
+        return height(node.left) - height(node.right)
+
+    def left_rotate(node):
+        A = node
+        B = node.right
+        B.parent = A.parent
+        A.parent = B
+        A.right = B.left
+        B.left = A
+
+    def right_rotate(node):
+        A = node
+        B = node.left
+        B.parent = A.parent
+        A.parent = B
+        A.left = B.right
+        B.right = A
+
+    def rebalance(node):
+        if balance_factor(node) == -2:
+            if balance_factor(node.right) == -1: # right-right case
+                left_rotate(node)
+            elif balance_factor(node.right) == 1: # right-left case
+                right_rotate(node.right)
+                left_rotate(node)
+        elif balance_factor(node) == 2:
+            if balance_factor(node.left) == 1: # left-left case
+                right_rotate(node)
+            elif balance_factor(node.left) == -1: # left-right case
+                left_rotate(node.left)
+                right_rotate(node)
+
+
+
+
+
+
+
