@@ -57,6 +57,7 @@ class ClientMessage(MessageProtocol):
         self.message_type = MessageType("query")
         self.ciphertext = ciphertext
 
+    #TODO what about for the root?
     def _check_insert_direction(self):
         if not (self.insert_direction == 'left' or self.insert_direction == 'right'):
            raise Exception("'%s' is not a valid insert direction" % self.insert_direction)
