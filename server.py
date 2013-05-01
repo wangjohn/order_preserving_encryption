@@ -38,7 +38,7 @@ class Server:
         # use fake ope table for now -- instead of storing the OPE path, 
         # we store pointers to the node directly 
         self.fake_ope_table = {} 
-        self.root = Server.OPE_Node(None)
+        self.root = None
         self.learner = Server.MachineLearner()
 
     '''
@@ -47,27 +47,27 @@ class Server:
     def receive(self, client_message):
         self.learner.process_message(client_message)
 
-        if (client_message.message_type == protocol.MessageType("move_left")):
+        if (client_message.message_type.__repr__() == protocol.MessageType("move_left").__repr__()):
             left_child = self.fake_ope_table[client_message.ciphertext].left
             if left_child:
-                return ServerMessage(ciphertext=left_child.ciphertext, client_message=client_message)
+                return protocol.ServerMessage(ciphertext=left_child.value, client_message=client_message)
             else:
-                return ServerMessage(ciphertext=None, client_message=client_message)
+                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
 
-        elif (client_message.message_type == protocol.MessageType("move_right")):
+        elif (client_message.message_type.__repr__() == protocol.MessageType("move_right").__repr__()):
             right_child = self.fake_ope_table[client_message.ciphertext].right
             if right_child:
-                return ServerMessage(ciphertext=right_child.ciphertext, client_message=client_message)
+                return protocol.ServerMessage(ciphertext=right_child.value, client_message=client_message)
             else:
-                return ServerMessage(ciphertext=None, client_message=client_message)
+                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
 
-        elif (client_message.message_type == protocol.MessageType("get_root")):
+        elif (client_message.message_type.__repr__() == protocol.MessageType("get_root").__repr__()):
             if not self.root:
-                return ServerMessage(ciphertext=None, client_message=client_message)
-            return ServerMessage(ciphertext=self.root.ciphertext, client_message=client_message)
+                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
+            return protocol.ServerMessage(ciphertext=self.root.value, client_message=client_message)
 
-        elif (client_message.message_type == protocol.MessageType("insert")):
-            new_node = OPE_Node(client_message.new_ciphertext)
+        elif (client_message.message_type.__repr__() == protocol.MessageType("insert").__repr__()):
+            new_node = Server.OPE_Node(client_message.new_ciphertext)
             # root case
             if client_message.ciphertext == None:
                 self.root = new_node
@@ -84,11 +84,11 @@ class Server:
                 while (node.parent != None):
                     self.rebalance(node.parent)
                     node = node.parent 
-            return ServerMessage(ciphertext=new_node.new_ciphertext, client_message=client_message)
+            return protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
 
-        elif (client_message.message_type == protocol.MessageType("query")):
+        elif (client_message.message_type.__repr__() == protocol.MessageType("query").__repr__()):
             # trivial implementation since there is no data associated with a ciphertext besides itself
-            return ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
+            return protocol.ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
 
     '''
     These functions handle a rebalance of the tree upon insertion of a node. 
@@ -102,43 +102,44 @@ class Server:
     rooted at that node.
     '''
 
-    def subtree_size(self, node):
+    def subtree_size(node):
         if node is None:
             return 0
         if node.left is None and node.right is None:
             return 1
         elif node.left is None:
-            return 1 + self.subtree_size(node.right)
+            return 1 + subtree_size(node.right)
         elif node.right is None:
-            return 1 + self.subtree_size(node.left)
+            return 1 + subtree_size(node.left)
         else:
-            return 1 + sum[self.subtree_size(node.left), self.subtree_size(node.right)] 
+            return 1 + sum[subtree_size(node.left), subtree_size(node.right)] 
 
     def counter(fn):
         def wrapper(*args, **kwargs):
+            subtree_sizes = []
             for arg in args:
-                subtree_sizes += [subtree_size(node)]
+                subtree_sizes += [Server.subtree_size(node)]
             return fn(*args, **kwargs)
         wrapper.subtree_sizes = []
         wrapper.__name__ = fn.__name__
         return wrapper
 
-    def height(self,node):
+    def height(node):
         if node is None:
             return 0
         if node.left is None and node.right is None:
             return 1
         elif node.left is None:
-            return 1 + self.height(node.right)
+            return 1 + height(node.right)
         elif node.right is None:
-            return 1 + self.height(node.left)
+            return 1 + height(node.left)
         else:
-            return 1 + max(self.height(node.left), self.height(node.right))
+            return 1 + max(height(node.left), height(node.right))
 
-    def balance_factor(self, node):
-        return self.height(node.left) - self.height(node.right)
+    def balance_factor(node):
+        return height(node.left) - height(node.right)
 
-    def left_rotate(self, node):
+    def left_rotate(node):
         A = node
         B = node.right
         B.parent = A.parent
@@ -146,7 +147,7 @@ class Server:
         A.right = B.left
         B.left = A
 
-    def right_rotate(self, node):
+    def right_rotate(node):
         A = node
         B = node.left
         B.parent = A.parent
@@ -159,20 +160,20 @@ class Server:
     allowing us to figure out the speed of our insertion procedure.
     len(rebalance.heights) is the number of rebalances.
     '''
-    @counter 
+    @counter
     def rebalance(self, node):
-        if self.balance_factor(node) == -2:
-            if self.balance_factor(node.right) == -1: # right-right case
-                self.left_rotate(node)
-            elif self.balance_factor(node.right) == 1: # right-left case
-                self.right_rotate(node.right)
-                self.left_rotate(node)
-        elif self.balance_factor(node) == 2:
-            if self.balance_factor(node.left) == 1: # left-left case
-                self.right_rotate(node)
-            elif self.balance_factor(node.left) == -1: # left-right case
-                self.left_rotate(node.left)
-                self.right_rotate(node)
+        if balance_factor(node) == -2:
+            if balance_factor(node.right) == -1: # right-right case
+                left_rotate(node)
+            elif balance_factor(node.right) == 1: # right-left case
+                right_rotate(node.right)
+                left_rotate(node)
+        elif balance_factor(node) == 2:
+            if balance_factor(node.left) == 1: # left-left case
+                right_rotate(node)
+            elif balance_factor(node.left) == -1: # left-right case
+                left_rotate(node.left)
+                right_rotate(node)
 
 
 
