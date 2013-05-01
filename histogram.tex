@@ -27,11 +27,38 @@ The adversary shall win the game if its guess is correct $b' = b$ and the sets h
 
 Definition: IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
 
+\subsection{Security of DCS}
+
 Security Proof:
 We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sets of size $\lambda$.
 
 We will show this by induction on the number of repeated elements in either $V_i$ or $W_i$. We shall first consider the base case when there are no repeated elements in $V_i$ or in $W_i$, so that all the elements in $V_i$ are distinct, as well as the elements in $W_i$. In this case, the sequence $v$ can be broken down into $\kappa$ sequences of all distinct elements. This has a clear bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) shows that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. This means that the DCS scheme is IND-CPDA secure when there are no repeated elements.
 
 Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure.
+
+\section{Random Tiebreaking Order Preserving Encryption (RTOPE)}
+
+  Consider a simple tie-breaking rule on top of Popa et al (2013)'s mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability.
+
+  To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process.
+
+  This scheme is a simple extension of Popa et al (2013)'s scheme and handles repeated values. In RTOPE, the server cannot tell how many values are repeated, and what the distribution of repeated values looks like.
+
+  \subsection{Security of RTOPE}
+
+  RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, one can show the equivalence of RTOPE and DCS in terms of the OPE encodings that both provide.
+
+  \subsection{Equivalence of RTOPE and DCS}
+
+  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. Formally, we define equivalence as follows:
+
+  \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Order_x(c_i) = \omega] = Pr[f(Order_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Order_x(c_i)$ and $Order_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
+
+  In other words, for two schemes to be equivalent, there must exist a mapping $f$ from all of the possible OPE encodings from scheme $x$ to scheme $y$, where the probability of obtaining an encoding in $x$ is the same as the probability of obtaining the corresponding encoding in $y$ (based on the mapping). This must be the case for all possible encodings.
+
+  This notion of equivalence encompasses a number of useful features. In particular, notice that if $x$ is an OPE encoding scheme which is IND-CPDA secure, and $y$ is equivalent to $x$, then $y$ is also IND-CPDA secure. Due to this notion, it is sufficient to show the equivalence of two schemes in order to link the IND-CPDA security of the schemes (the proof of this property is given in the theorem below). Another observation one can make is that the mapping in the equivalence definition is bijective. Hence, if $x$ is equivalent to $y$, then $y$ is necessarily equivalent to $x$ because one can simply use $f^{-1}$ as the mapping, which necessarily exists because of $f$ being bijective.
+
+  \emph{Theorem:} If two OPE schemes $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
+  \emph{Proof:} First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes. 
 
 \end{document}
