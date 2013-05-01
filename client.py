@@ -1,9 +1,8 @@
-import encryption
-import protocol
+import encryption, protocol, random
 
 class Client:
     def __init__(self, communication_channel):
-        self.encryption_scheme = encyption.BasicEncryptionScheme()
+        self.encryption_scheme = encryption.BasicEncryptionScheme()
         self.key = self.encryption_scheme.generate_key()
         self.communication_channel = communication_channel
 
@@ -44,9 +43,11 @@ class Client:
                 current_ciphertext = self._move_right(current_ciphertext)
 
             else:
-                # Arbitrarily choose to insert in the right direction since the
-                # node values are actually the same.
-                return self._insert(current_node, original_ciphertext, "right")
+                # Randomly choose which side to insert on.
+                if random.random() > .5:
+                    return self._insert(current_node, original_ciphertext, "left")
+                else:
+                    return self._insert(current_node, original_ciphertext, "right")
 
     def _get_root(self):
         client_message = protocol.ClientMessage().get_root()
