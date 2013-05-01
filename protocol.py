@@ -8,7 +8,7 @@ class MessageProtocol:
         self.uuid = uuid.uuid4() # generates a random universally unique ID.
 
 # Message which the server sends to the client. Must contain a ciphertext.
-class SeverMessage(MessageProtocol)
+class SeverMessage(MessageProtocol):
     def __init__(self, ciphertext, client_message):
         MessageProtocol.__init__(self)
         self.ciphertext = ciphertext
@@ -27,7 +27,7 @@ class SeverMessage(MessageProtocol)
 #
 # Once one of these messages is called, the message will be automatically
 # configured with the correct +MessageType+
-class ClientMessage(MessageProtocol)
+class ClientMessage(MessageProtocol):
     def __init__(self):
         MessageProtocol.__init__(self)
         self.message_type = None
@@ -74,6 +74,9 @@ class MessageType:
     def type(self):
         self._message_type
 
-    def _check_valid_message_type(self)
-        if self.message_type not in valid_message_types:
+    def __repr__(self):
+        return self._message_type        
+
+    def _check_valid_message_type(self):
+        if self._message_type not in ["move_left", "move_right", "get_root", "insert", "query"]:
             raise Exception("'%s' is not a valid message type" % message_type)

@@ -2,7 +2,7 @@ import encryption, protocol, random
 
 class Client:
     def __init__(self, communication_channel):
-        self.encryption_scheme = encyption.BasicEncryptionScheme()
+        self.encryption_scheme = encryption.BasicEncryptionScheme()
         self.key = self.encryption_scheme.generate_key()
         self.communication_channel = communication_channel
 
