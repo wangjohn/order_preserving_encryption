@@ -83,101 +83,101 @@ class Server:
                     node.right = new_node
                 self.fake_ope_table[client_message.new_ciphertext] = new_node
                 # AVL rebalance
-                while (node.parent != None):
-                    self.rebalance(node.parent)
+                while (node and node.parent):
+                    rebalance(node.parent)
                     node = node.parent 
             server_message = protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("query").__repr__()):
             # trivial implementation since there is no data associated with a ciphertext besides itself
             server_message = protocol.ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
+        
         self.communication_channel.put(server_message)
         return server_message
 
-    '''
-    These functions handle a rebalance of the tree upon insertion of a node. 
-    In our implementation, because we use a fake_ope_table with pointers to 
-    the nodes, this procedure doesn't take very long. However, in CryptDB, 
-    this procedure is the very time-consuming.
+'''
+These functions handle a rebalance of the tree upon insertion of a node. 
+In our implementation, because we use a fake_ope_table with pointers to 
+the nodes, this procedure doesn't take very long. However, in CryptDB, 
+this procedure is the very time-consuming.
 
-    Specifically, we count two things: 1) the number of rebalance operations
-    and 2) the subtree size at each rebalanced node. This is because in CryptDB,
-    the time taken for each rebalance is proportional to the height of the subtree
-    rooted at that node.
-    '''
+Specifically, we count two things: 1) the number of rebalance operations
+and 2) the subtree size at each rebalanced node. This is because in CryptDB,
+the time taken for each rebalance is proportional to the height of the subtree
+rooted at that node.
+'''
 
-    def subtree_size(node):
-        if node is None:
-            return 0
-        if node.left is None and node.right is None:
-            return 1
-        elif node.left is None:
-            return 1 + subtree_size(node.right)
-        elif node.right is None:
-            return 1 + subtree_size(node.left)
-        else:
-            return 1 + sum[subtree_size(node.left), subtree_size(node.right)] 
+def subtree_size(node):
+    if node is None:
+        return 0
+    if node.left is None and node.right is None:
+        return 1
+    elif node.left is None:
+        return 1 + subtree_size(node.right)
+    elif node.right is None:
+        return 1 + subtree_size(node.left)
+    else:
+        return 1 + sum[subtree_size(node.left), subtree_size(node.right)] 
 
-    def counter(fn):
-        def wrapper(*args, **kwargs):
-            subtree_sizes = []
-            for arg in args: # only arg is "node"
-                subtree_sizes += [Server.subtree_size(arg)]
-            return fn(*args, **kwargs)
-        wrapper.subtree_sizes = []
-        wrapper.__name__ = fn.__name__
-        return wrapper
+def counter(fn):
+    def wrapper(*args, **kwargs):
+        node = args[0]
+        wrapper.subtree_sizes += [subtree_size(node)]
+        return fn(*args, **kwargs)
+    wrapper.subtree_sizes = []
+    wrapper.__name__ = fn.__name__
+    return wrapper
 
-    def height(node):
-        if node is None:
-            return 0
-        if node.left is None and node.right is None:
-            return 1
-        elif node.left is None:
-            return 1 + height(node.right)
-        elif node.right is None:
-            return 1 + height(node.left)
-        else:
-            return 1 + max(height(node.left), height(node.right))
+def height(node):
+    if node is None:
+        return 0
+    if node.left is None and node.right is None:
+        return 1
+    elif node.left is None:
+        return 1 + height(node.right)
+    elif node.right is None:
+        return 1 + height(node.left)
+    else:
+        return 1 + max(height(node.left), height(node.right))
 
-    def balance_factor(node):
-        return height(node.left) - height(node.right)
+def balance_factor(node):
+    return height(node.left) - height(node.right)
 
-    def left_rotate(node):
-        A = node
-        B = node.right
-        B.parent = A.parent
-        A.parent = B
-        A.right = B.left
-        B.left = A
+def left_rotate(node):
+    A = node
+    B = node.right
+    B.parent = A.parent
+    A.parent = B
+    A.right = B.left
+    B.left = A
 
-    def right_rotate(node):
-        A = node
-        B = node.left
-        B.parent = A.parent
-        A.parent = B
-        A.left = B.right
-        B.right = A
+def right_rotate(node):
+    A = node
+    B = node.left
+    B.parent = A.parent
+    A.parent = B
+    A.left = B.right
+    B.right = A
 
-    '''
-    rebalance.heights will return the subtree_sizes of every rebalance,
-    allowing us to figure out the speed of our insertion procedure.
-    len(rebalance.heights) is the number of rebalances.
-    '''
-    @counter
-    def rebalance(self, node):
-        if balance_factor(node) == -2:
-            if balance_factor(node.right) == -1: # right-right case
-                left_rotate(node)
-            elif balance_factor(node.right) == 1: # right-left case
-                right_rotate(node.right)
-                left_rotate(node)
-        elif balance_factor(node) == 2:
-            if balance_factor(node.left) == 1: # left-left case
-                right_rotate(node)
-            elif balance_factor(node.left) == -1: # left-right case
-                left_rotate(node.left)
-                right_rotate(node)
+'''
+rebalance.heights will return the subtree_sizes of every rebalance,
+allowing us to figure out the speed of our insertion procedure.
+len(rebalance.heights) is the number of rebalances.
+'''
+@counter
+def rebalance(node):
+    if balance_factor(node) == -2:
+        if balance_factor(node.right) == -1: # right-right case
+            left_rotate(node)
+        elif balance_factor(node.right) == 1: # right-left case
+            right_rotate(node.right)
+            left_rotate(node)
+    elif balance_factor(node) == 2:
+        if balance_factor(node.left) == 1: # left-left case
+            right_rotate(node)
+        elif balance_factor(node.left) == -1: # left-right case
+            left_rotate(node.left)
+            right_rotate(node)
 
 
 
