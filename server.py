@@ -121,8 +121,8 @@ class Server:
     def counter(fn):
         def wrapper(*args, **kwargs):
             subtree_sizes = []
-            for arg in args:
-                subtree_sizes += [Server.subtree_size(node)]
+            for arg in args: # only arg is "node"
+                subtree_sizes += [Server.subtree_size(arg)]
             return fn(*args, **kwargs)
         wrapper.subtree_sizes = []
         wrapper.__name__ = fn.__name__
