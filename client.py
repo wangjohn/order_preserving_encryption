@@ -8,7 +8,8 @@ class Client:
 
     def query(self, message):
         ciphertext = self.encryption_scheme.encrypt(self.key, message)
-        client_message = protocol.ClientMessage().query(ciphertext)
+        client_message = protocol.ClientMessage()
+        client_message.query(ciphertext)
         return self._send_client_message(client_message)
 
     # Stores a plaintext message +message+ in the database by communicating and
@@ -69,7 +70,7 @@ class Client:
     # server responds with
     def _send_client_message(self, client_message):
         self.communication_channel.put(client_message)
-        server_message = self.communication_channel.get(client_message.uuid)
+        server_message = self.communication_channel.get()
         root_ciphertext = server_message.ciphertext
 
         return self.encryption_scheme.decrypt(self.key, root_ciphertext)

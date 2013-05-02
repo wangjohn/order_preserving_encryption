@@ -33,13 +33,14 @@ class Server:
             else:
                 return "INCREASING"
 
-    def __init__(self):
+    def __init__(self, communication_channel):
         self.ope_table = {} 
         # use fake ope table for now -- instead of storing the OPE path, 
         # we store pointers to the node directly 
         self.fake_ope_table = {} 
         self.root = None
         self.learner = Server.MachineLearner()
+        self.communication_channel = communication_channel
 
     '''
     Server response to a client message.
@@ -50,21 +51,22 @@ class Server:
         if (client_message.message_type.__repr__() == protocol.MessageType("move_left").__repr__()):
             left_child = self.fake_ope_table[client_message.ciphertext].left
             if left_child:
-                return protocol.ServerMessage(ciphertext=left_child.value, client_message=client_message)
+                server_message = protocol.ServerMessage(ciphertext=left_child.value, client_message=client_message)
             else:
-                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
+                server_message = protocol.ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("move_right").__repr__()):
             right_child = self.fake_ope_table[client_message.ciphertext].right
             if right_child:
-                return protocol.ServerMessage(ciphertext=right_child.value, client_message=client_message)
+                server_message = protocol.ServerMessage(ciphertext=right_child.value, client_message=client_message)
             else:
-                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
+                server_message = protocol.ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("get_root").__repr__()):
             if not self.root:
-                return protocol.ServerMessage(ciphertext=None, client_message=client_message)
-            return protocol.ServerMessage(ciphertext=self.root.value, client_message=client_message)
+                server_message = protocol.ServerMessage(ciphertext=None, client_message=client_message)
+            else:
+                server_message = protocol.ServerMessage(ciphertext=self.root.value, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("insert").__repr__()):
             new_node = Server.OPE_Node(client_message.new_ciphertext)
@@ -84,11 +86,13 @@ class Server:
                 while (node.parent != None):
                     self.rebalance(node.parent)
                     node = node.parent 
-            return protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
+            server_message = protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("query").__repr__()):
             # trivial implementation since there is no data associated with a ciphertext besides itself
-            return protocol.ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
+            server_message = protocol.ServerMessage(ciphertext=client_message.ciphertext, client_message=client_message)
+        self.communication_channel.put(server_message)
+        return server_message
 
     '''
     These functions handle a rebalance of the tree upon insertion of a node. 
@@ -117,8 +121,8 @@ class Server:
     def counter(fn):
         def wrapper(*args, **kwargs):
             subtree_sizes = []
-            for arg in args:
-                subtree_sizes += [Server.subtree_size(node)]
+            for arg in args: # only arg is "node"
+                subtree_sizes += [Server.subtree_size(arg)]
             return fn(*args, **kwargs)
         wrapper.subtree_sizes = []
         wrapper.__name__ = fn.__name__
