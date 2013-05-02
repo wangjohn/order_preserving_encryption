@@ -1,6 +1,4 @@
-import unittest
-import communication_channel
-import protocol
+import unittest, communication_channel, protocol
 
 class TestProtocol(unittest.TestCase):
 
@@ -8,7 +6,7 @@ class TestProtocol(unittest.TestCase):
 		self.factory = communication_channel.CommunicationFactory()
 		self.server_channel = self.factory.build_for("server")
 		self.client_channel = self.factory.build_for("client")
-		self.channel = communication_channel.CommunicationChannel(self.server_channel,self.client_channel)
+		#self.client = client.Client(self.client_channel)
 		self.client_message = protocol.ClientMessage()
 		self.client_message.get_root()
 
@@ -18,8 +16,8 @@ class TestProtocol(unittest.TestCase):
 
 	# TODO this test is failing
 	# def test_get(self):
-	# 	self.channel.put(self.client_message)
-	# 	message = self.channel.get()
+	# 	self.client_channel.put(self.client_message)
+	# 	message = self.client_channel.get()
 	# 	self.assertEqual(message, self.client_message)		
 
 if __name__ == '__main__':

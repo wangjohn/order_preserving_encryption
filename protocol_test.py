@@ -1,6 +1,4 @@
-import unittest
-import protocol
-import encryption
+import unittest, protocol, encryption
 
 class TestProtocol(unittest.TestCase):
 
@@ -9,6 +7,9 @@ class TestProtocol(unittest.TestCase):
 		self.key = self.encryption_scheme.generate_key()
 		self.message = 1010101
 
+	''' Creates all possible message types and assert that the 
+	type is correct
+	'''
 	def test_move_left(self):
 		ciphertext = self.encryption_scheme.encrypt(self.key, self.message)
 		client_message = protocol.ClientMessage()

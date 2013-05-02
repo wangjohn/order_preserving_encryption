@@ -13,6 +13,7 @@ class ServerMessage(MessageProtocol):
         MessageProtocol.__init__(self)
         self.ciphertext = ciphertext
         self.client_message = client_message
+        self.message_type = MessageType("query")
 
 # Message which the client sends to the server.
 #
