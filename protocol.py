@@ -8,7 +8,7 @@ class MessageProtocol:
         self.uuid = uuid.uuid4() # generates a random universally unique ID.
 
 # Message which the server sends to the client. Must contain a ciphertext.
-class SeverMessage(MessageProtocol):
+class ServerMessage(MessageProtocol):
     def __init__(self, ciphertext, client_message):
         MessageProtocol.__init__(self)
         self.ciphertext = ciphertext
