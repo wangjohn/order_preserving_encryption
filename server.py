@@ -159,6 +159,7 @@ def right_rotate(node):
     A.parent = B
     A.left = B.right
     B.right = A
+    B.parent.right = B
 
 '''
 rebalance.heights will return the subtree_sizes of every rebalance,
