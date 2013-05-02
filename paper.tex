@@ -1,34 +1,28 @@
-\documentclass[psamsfonts]{amsart}
+\documentclass[12pt]{article}
 
 %-------Packages---------
 \usepackage{amssymb,amsfonts}
 \usepackage{enumerate}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{rotating}
 \usepackage{amsthm}
-\usepackage{theorem}
-\usepackage{verbatim}
-\usepackage{graphics}
-\usepackage{float}
 
-\newenvironment{thm}{{\bfseries Theorem:}}
-\newenvironment{lemma}{{\bfseries Lemma:}}
-\newenvironment{proof}{{\bfseries Proof:}}{\qedsymbol}
-\newenvironment{def}{{\bfseries Definition:}}
-
-\bibliographystyle{plain}
-
-\voffset = -10pt
-\headheight = 0pt
-\topmargin = -20pt
-\textheight = 690pt
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
 
 %--------Meta Data: Fill in your info------
-\title{Order Preserving Encryption Schemes:
+\title{Order Preserving Encryption Schemes: \\
   Preventing the Leakage of Distribution\\
 6.857 Final Paper \\
 Hrishikesh Joshi, Max Kolysh, Mari Miyachi, John Wang}
 
 \begin{document}
+
+\maketitle
 
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
 
@@ -52,20 +46,32 @@ In phase III:
   \item Adversary outputs $b'$ as its guess for $b$. 
 \end{itemize}
 
-The adversary shall win the game if its guess is correct $b' = b$ and the sets have the same order relations (namely that $v_{ij}^0 < v_{ik}^0 \Leftrightarow v_{ij}^1 < v_{ik}^1$).
+The adversary shall win the game if its guess is correct $b' = b$ and the sets have the same order relations (namely that $v_{ij}^0 < v_{ik}^0 \Leftrightarrow v_{ij}^1 < v_{ik}^1$).
 
-Definition: The adversary's advantage is the difference $|Pr[\textrm{win}^{Adv, \kappa, \lambda}] - 1/2|$.
+\begin{definition}
+  The adversary's advantage is the difference $|Pr[\textrm{win}^{Adv, \kappa, \lambda}] - 1/2|$.
+\end{definition}
 
-Definition: IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, the adversary's advantage is negligible, i.e. that $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
+\begin{definition}
+  IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, the adversary's advantage is negligible, i.e. that $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
+\end{definition}
 
 \subsection{Security of DCS}
 
-Security Proof:
-We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sets of size $\lambda$.
+\begin{theorem}
+  DCS is IND-CPDA secure 
+\end{theorem}
+\begin{proof}
+We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sequences of size $\lambda$.
 
 We will show this by induction on the number of repeated elements in either $V_i$ or $W_i$. We shall first consider the base case when there are no repeated elements in $V_i$ or in $W_i$, so that all the elements in $V_i$ are distinct, as well as the elements in $W_i$. In this case, the sequence $v$ can be broken down into $\kappa$ sequences of all distinct elements. This has a clear bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) shows that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. This means that the DCS scheme is IND-CPDA secure when there are no repeated elements.
 
-Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure.
+Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure. To complete the proof, we simply need to show that when there are $k+1$ repeated elements, the DCS scheme is still secure.
+
+Let us compare the sets $V_i$ and $W_i$ with $k+1$ repeated elements to the sets with $k$ repeated elements. In the $k+1$ case, there is one extra reptition with a value that has already appeared, on top of the $k$ repetitions that already exist. Now consider the plaintext $x$ which is repeated. The probability that the OPE encoding of $x$ has already appeared in the sequence of elements in the set $V_i$ or $W_i$ is negligible at $O(2^{-\lambda} \kappa)$. Since the OPE encoding is not repeated by the new value $x$, the number of OPE encoding repetitions is at most $k$. However, we have shown that when there are $k$ repeated elements in the sets $V_i$ and $W_i$, then DCS is IND-CPDA secure by the inductive hypothesis. Since the largest number of repeated encodings in this case is $k$, this is the same situation as when there are $k$ repeated elements in the sets $V_i$ and $W_i$. Therefore, when there are $k+1$ repeated elements, DCS is IND-CPDA secure.
+
+We have therefore shown by induction that DCS is IND-CPDA secure for any number of repeated elements in the sets $V_i$ and $W_i$, which completes the proof that DCS is IND-CPDA secure.
+\end{proof}
 
 \section{Random Tiebreaking Order Preserving Encryption (RTOPE)}
 
@@ -89,11 +95,43 @@ Now we shall use strong induction and assume that when there are a maximum of $k
 
   This notion of equivalence encompasses a number of useful features. In particular, notice that if $x$ is an OPE encoding scheme which is IND-CPDA secure, and $y$ is equivalent to $x$, then $y$ is also IND-CPDA secure. Due to this notion, it is sufficient to show the equivalence of two schemes in order to link the IND-CPDA security of the schemes (the proof of this property is given in the theorem below). Another observation one can make is that the mapping in the equivalence definition is bijective. Hence, if $x$ is equivalent to $y$, then $y$ is necessarily equivalent to $x$ because one can simply use $f^{-1}$ as the mapping, which necessarily exists because of $f$ being bijective.
 
-  \emph{Theorem:} If two OPE schemes $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
-  \emph{Proof:} First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes.
+\begin{theorem}
+ If two OPE schemes $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
+\end{theorem}
+\begin{proof}
+  First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes.
 
   Since $x$ is IND-CPDA secure, then for any two sequences $v = \{V_1, V_2, \ldots, V_{\kappa}\}$ and $w = \{W_1, W_2, \ldots, W_{\kappa} \}$ that the adversary provides, the adversary cannot correctly distinguish between $v$ and $w$ with non-neglible advantage. Now suppose by contradiction that $y$ is not IND-CPDA secure. Then there exist two sequences $v' = \{V_1', \ldots, V_{\kappa}'\}$ and $w' = \{W_1', \ldots, W_{\kappa}'\}$ of plaintexts that the adversary can provide to the client so that he can distinguish the two sequences with non-neglible advantage in the client-server interaction. This means that the adversary can distinguish the encoding $Encode_y(V_i') = \{Encode_y(V_{ij}' \}_{j=1}^{\lambda}$ for some $i$ from the encoding $Encode_y(W_i') = \{Encode_y(W_{ij}') \}_{j=1}^{\lambda}$.
 
   This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
+\end{proof}
+
+We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
+
+\begin{proposition}
+  There exists some subtree which contains all the ciphertexts corresponding to a plaintext $x$ in both DCS and RTOPE.
+\end{proposition}
+\begin{proof}
+  This proposition is immediately clear because one can always take the entire tree as the subtree. This works for the cipher text trees stored in both DCS and RTOPE.
+\end{proof}
+
+Since a subtree containing all the ciphertexts corresponding to a plaintext $x$ exists, we can now examine properties of this subtree. First, we show that the root of the smallest possible such subtree must be a ciphertext which gets decrypted to $x$.
+
+\begin{proposition}
+  The smallest subtree containing all ciphertexts which can be decrypted to some plaintext $x$ is rooted at a ciphertext $c$ such that $x = Dec(SK, c)$ in both DCS and RTOPE.
+\end{proposition}
+\begin{proof}
+  First, we know that a subtree containing all ciphertexts which can be decrypted to $x$ exists, by the proposition we gave above. We therefore also know that a smallest subtree exists because the entire tree is of finite size. Now we shall show that this smallest subtree is rooted at $c$ such that $x = Dec(SK, c)$ for DCS.
+
+  Suppose not, by contradiction. Then some ciphertext $c'$ is at the root such that $x' = Dec(SK, c')$ where $x' \neq x$. Since DCS is normalized to integer plaintexts, we must have $|x' - x| \geq 1$. We know, moreover, that there must be at least one ciphertext $c_l$ in the left subtree of the root and $c_r$ in the right subtree of the root such that $x = Dec(SK, c_l) = Dec(SK, c_r)$. If not, then the subtree we are in is not the smallest subtree containing all ciphertexts which decrypt to $x$ because one can simply take either the right or left subtree (depending on if the left or right subtree does not contain $c_l$ or $c_r$ respectively).
+
+  However, we know that $Dec(SK, c_l) \leq Dec(SK, c') \leq Dec(SK, c_r)$ by the fact that $c_l$ is in the left subtree of $c'$ and that $c_r$ is in the right subtree. This implies that $x \leq x' \leq x$ so that $x' = x$. However, this is a contradiction because we assumed that $x' \neq x$. We have therefore shown that for DCS, the smallest subtree containing all cipertexts decrypting to $x$ must be rooted at a ciphertext decrypting to $x$.
+
+  The proof for RTOPE is similar and we only provide a sketch. If $c'$ is a root which does not decrypt to $x$, then it must be separating a left and right subtree which contain $c_l$ and $c_r$, respectively, which decrypt to $x$. This means that $Dec(SK, c_l) \leq Dec(SK, c') \leq Dec(SK, c_r)$ which means that $x' = x$, which results in a contradiction (just like in the proof for DCS).
+\end{proof}
+
+We have seen that the smallest subtree containing a repeated plaintext will be rooted at a ciphertext decrypting to that plaintext. This has a number of interesting applications. For instance, one can examine the series of decisions that are made in the RTOPE scheme by the client by examining this subtree and a smaller subtree in a recursive fashion.
+
+For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried.
 
 \end{document}
