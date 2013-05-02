@@ -106,4 +106,32 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
   This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
 \end{proof}
 
+We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
+
+\begin{proposition}
+  There exists some subtree which contains all the ciphertexts corresponding to a plaintext $x$ in both DCS and RTOPE.
+\end{proposition}
+\begin{proof}
+  This proposition is immediately clear because one can always take the entire tree as the subtree. This works for the cipher text trees stored in both DCS and RTOPE.
+\end{proof}
+
+Since a subtree containing all the ciphertexts corresponding to a plaintext $x$ exists, we can now examine properties of this subtree. First, we show that the root of the smallest possible such subtree must be a ciphertext which gets decrypted to $x$.
+
+\begin{proposition}
+  The smallest subtree containing all ciphertexts which can be decrypted to some plaintext $x$ is rooted at a ciphertext $c$ such that $x = Dec(SK, c)$ in both DCS and RTOPE.
+\end{proposition}
+\begin{proof}
+  First, we know that a subtree containing all ciphertexts which can be decrypted to $x$ exists, by the proposition we gave above. We therefore also know that a smallest subtree exists because the entire tree is of finite size. Now we shall show that this smallest subtree is rooted at $c$ such that $x = Dec(SK, c)$ for DCS.
+
+  Suppose not, by contradiction. Then some ciphertext $c'$ is at the root such that $x' = Dec(SK, c')$ where $x' \neq x$. Since DCS is normalized to integer plaintexts, we must have $|x' - x| \geq 1$. We know, moreover, that there must be at least one ciphertext $c_l$ in the left subtree of the root and $c_r$ in the right subtree of the root such that $x = Dec(SK, c_l) = Dec(SK, c_r)$. If not, then the subtree we are in is not the smallest subtree containing all ciphertexts which decrypt to $x$ because one can simply take either the right or left subtree (depending on if the left or right subtree does not contain $c_l$ or $c_r$ respectively).
+
+  However, we know that $Dec(SK, c_l) \leq Dec(SK, c') \leq Dec(SK, c_r)$ by the fact that $c_l$ is in the left subtree of $c'$ and that $c_r$ is in the right subtree. This implies that $x \leq x' \leq x$ so that $x' = x$. However, this is a contradiction because we assumed that $x' \neq x$. We have therefore shown that for DCS, the smallest subtree containing all cipertexts decrypting to $x$ must be rooted at a ciphertext decrypting to $x$.
+
+  The proof for RTOPE is similar and we only provide a sketch. If $c'$ is a root which does not decrypt to $x$, then it must be separating a left and right subtree which contain $c_l$ and $c_r$, respectively, which decrypt to $x$. This means that $Dec(SK, c_l) \leq Dec(SK, c') \leq Dec(SK, c_r)$ which means that $x' = x$, which results in a contradiction (just like in the proof for DCS).
+\end{proof}
+
+We have seen that the smallest subtree containing a repeated plaintext will be rooted at a ciphertext decrypting to that plaintext. This has a number of interesting applications. For instance, one can examine the series of decisions that are made in the RTOPE scheme by the client by examining this subtree and a smaller subtree in a recursive fashion.
+
+For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried.
+
 \end{document}
