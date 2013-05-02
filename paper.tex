@@ -1,3 +1,32 @@
+\documentclass[psamsfonts]{amsart}
+
+%-------Packages---------
+\usepackage{amssymb,amsfonts}
+\usepackage{enumerate}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsthm}
+\usepackage{theorem}
+\usepackage{verbatim}
+\usepackage{graphics}
+\usepackage{float}
+
+\newenvironment{thm}{{\bfseries Theorem:}}
+\newenvironment{lemma}{{\bfseries Lemma:}}
+\newenvironment{proof}{{\bfseries Proof:}}{\qedsymbol}
+\newenvironment{def}{{\bfseries Definition:}}
+
+\bibliographystyle{plain}
+
+\voffset = -10pt
+\headheight = 0pt
+\topmargin = -20pt
+\textheight = 690pt
+
+%--------Meta Data: Fill in your info------
+\title{Order Preserving Encryption Schemes:
+  Preventing the Leakage of Distribution\\
+6.857 Final Paper \\
+Hrishikesh Joshi, Max Kolysh, Mari Miyachi, John Wang}
 
 \begin{document}
 
@@ -25,7 +54,9 @@ In phase III:
 
 The adversary shall win the game if its guess is correct $b' = b$ and the sets have the same order relations (namely that $v_{ij}^0 < v_{ik}^0 \Leftrightarow v_{ij}^1 < v_{ik}^1$).
 
-Definition: IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
+Definition: The adversary's advantage is the difference $|Pr[\textrm{win}^{Adv, \kappa, \lambda}] - 1/2|$.
+
+Definition: IND-CPDA. A mOPE scheme is IND-CPDA secure if for all adversaries and all sufficiently large $\kappa$ and $\lambda$, the adversary's advantage is negligible, i.e. that $Pr[\textrm{win}^{Adv, \kappa, \lambda}] \leq 1/2 + \textrm{negl}(\kappa, \lambda)$.
 
 \subsection{Security of DCS}
 
@@ -52,13 +83,17 @@ Now we shall use strong induction and assume that when there are a maximum of $k
 
   In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. Formally, we define equivalence as follows:
 
-  \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Order_x(c_i) = \omega] = Pr[f(Order_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Order_x(c_i)$ and $Order_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
+  \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
 
   In other words, for two schemes to be equivalent, there must exist a mapping $f$ from all of the possible OPE encodings from scheme $x$ to scheme $y$, where the probability of obtaining an encoding in $x$ is the same as the probability of obtaining the corresponding encoding in $y$ (based on the mapping). This must be the case for all possible encodings.
 
   This notion of equivalence encompasses a number of useful features. In particular, notice that if $x$ is an OPE encoding scheme which is IND-CPDA secure, and $y$ is equivalent to $x$, then $y$ is also IND-CPDA secure. Due to this notion, it is sufficient to show the equivalence of two schemes in order to link the IND-CPDA security of the schemes (the proof of this property is given in the theorem below). Another observation one can make is that the mapping in the equivalence definition is bijective. Hence, if $x$ is equivalent to $y$, then $y$ is necessarily equivalent to $x$ because one can simply use $f^{-1}$ as the mapping, which necessarily exists because of $f$ being bijective.
 
   \emph{Theorem:} If two OPE schemes $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
-  \emph{Proof:} First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes. 
+  \emph{Proof:} First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes.
+
+  Since $x$ is IND-CPDA secure, then for any two sequences $v = \{V_1, V_2, \ldots, V_{\kappa}\}$ and $w = \{W_1, W_2, \ldots, W_{\kappa} \}$ that the adversary provides, the adversary cannot correctly distinguish between $v$ and $w$ with non-neglible advantage. Now suppose by contradiction that $y$ is not IND-CPDA secure. Then there exist two sequences $v' = \{V_1', \ldots, V_{\kappa}'\}$ and $w' = \{W_1', \ldots, W_{\kappa}'\}$ of plaintexts that the adversary can provide to the client so that he can distinguish the two sequences with non-neglible advantage in the client-server interaction. This means that the adversary can distinguish the encoding $Encode_y(V_i') = \{Encode_y(V_{ij}' \}_{j=1}^{\lambda}$ for some $i$ from the encoding $Encode_y(W_i') = \{Encode_y(W_{ij}') \}_{j=1}^{\lambda}$.
+
+  This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
 
 \end{document}
