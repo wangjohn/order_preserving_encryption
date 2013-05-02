@@ -16,7 +16,6 @@ class TestServer(unittest.TestCase):
 		root_message.insert(None, 5, 'left')
 		server_message = self.s.receive(root_message)
 		self.assertEqual(root_message.new_ciphertext, server_message.ciphertext)
-		#self.assertEqual(1, server.Server.subtree_size(self.s.root))
 		self.assertEqual(self.s.fake_ope_table,{root_message.new_ciphertext: self.s.root})
 		self.assertEqual(server.Server.OPE_Node(root_message.new_ciphertext).value, self.s.root.value)
 
@@ -64,17 +63,38 @@ class TestServer(unittest.TestCase):
 
 	#TODO not working
 	def test_rebalance(self):
+		# insert root
 		root_message = protocol.ClientMessage()
 		root_message.insert(None, 5, 'left')
 		server_message = self.s.receive(root_message)
+		# insert left child
 		insert_message = protocol.ClientMessage()
 		insert_message.insert(5, 3, 'left')
 		server_message_2 = self.s.receive(insert_message)
-		insert_message_2 = protocol.ClientMessage()
-		insert_message_2.insert(3, 4, 'right')
-		server_message_3 = self.s.receive(insert_message_2)
-		self.assertEqual(4, server_message_3.ciphertext)
-		self.assertEqual(4, self.s.root.right)
+		self.assertEqual(3, self.s.root.left.value)
+		self.assertEqual(None, self.s.root.right)
+		# insert a right child into unbalanced tree
+		# insert_message_2 = protocol.ClientMessage()
+		# insert_message_2.insert(3, 4, 'right')
+		# server_message_3 = self.s.receive(insert_message_2)
+		new_node = server.Server.OPE_Node(4)
+		new_node.parent = self.s.root.left
+		self.s.root.left.right = new_node
+
+		self.assertEqual(3, server.height(self.s.root))
+		self.assertEqual(2, server.subtree_size(self.s.root.left))
+		self.assertEqual(2, server.balance_factor(self.s.root))
+
+		server.left_rotate(self.s.root.left)
+		self.assertEqual(4, self.s.root.left.value)
+		self.assertEqual(3, self.s.root.left.left.value)
+		self.assertEqual(3, server.subtree_size(self.s.root))
+
+		server.right_rotate(self.s.root)
+		# self.assertEqual(4, server_message_3.ciphertext)
+		self.assertEqual(5, self.s.root.value)
+		self.assertEqual(3, server.subtree_size(self.s.root))
+		self.assertEqual(4, self.s.root.right.value)
 
 if __name__ == '__main__':
 	unittest.main()

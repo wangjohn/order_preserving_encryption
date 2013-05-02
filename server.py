@@ -144,16 +144,17 @@ def balance_factor(node):
     return height(node.left) - height(node.right)
 
 def left_rotate(node):
-    A = node
-    B = node.right
-    B.parent = A.parent
-    A.parent = B
-    A.right = B.left
-    B.left = A
+    A = node #3
+    B = node.right #4
+    B.parent = A.parent #5 --- 3, 4
+    A.parent = B #5 - 4 - 3
+    A.right = B.left # 3 right - None
+    B.left = A # 4 left - 3
+    B.parent.left = B
 
 def right_rotate(node):
-    A = node
-    B = node.left
+    A = node 
+    B = node.left 
     B.parent = A.parent
     A.parent = B
     A.left = B.right
