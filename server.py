@@ -154,16 +154,18 @@ def left_rotate(node):
     A.parent = B #5 - 4 - 3
     A.right = B.left # 3 right - None
     B.left = A # 4 left - 3
-    B.parent.left = B
+    if B.parent:
+        B.parent.left = B
 
 def right_rotate(node):
-    A = node 
-    B = node.left 
-    B.parent = A.parent
-    A.parent = B
-    A.left = B.right
-    B.right = A
-    B.parent.right = B
+    A = node # 5
+    B = node.left # 4
+    B.parent = A.parent # 4 is root
+    A.parent = B # 4 - 5
+    A.left = B.right # 5 has no children
+    B.right = A 
+    if B.parent:
+        B.parent.right = B
 
 '''
 rebalance.heights will return the subtree_sizes of every rebalance,
