@@ -95,6 +95,10 @@ class Server:
         self.communication_channel.put(server_message)
         return server_message
 
+    def update_root(self):
+        while (self.root.parent != None):
+            self.root = self.root.parent
+
 '''
 These functions handle a rebalance of the tree upon insertion of a node. 
 In our implementation, because we use a fake_ope_table with pointers to 
