@@ -93,6 +93,9 @@ class TestServer(unittest.TestCase):
 		server.right_rotate(self.s.root)
 		# self.assertEqual(4, server_message_3.ciphertext)
 		self.assertEqual(5, self.s.root.value)
+		self.assertEqual(4, self.s.root.parent.value)
+		self.assertEqual(4, self.s.root.right.value)
+		self.assertEqual(3, self.s.root.left.value)
 		self.assertEqual(3, server.subtree_size(self.s.root))
 		self.assertEqual(4, self.s.root.right.value)
 
