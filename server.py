@@ -86,6 +86,7 @@ class Server:
                 while (node and node.parent):
                     rebalance(node.parent)
                     node = node.parent 
+                self.update_root()
             server_message = protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("query").__repr__()):
