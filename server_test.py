@@ -61,8 +61,7 @@ class TestServer(unittest.TestCase):
 		server_message_3 = self.s.receive(move_left_message)
 		self.assertEqual(3, server_message_3.ciphertext)
 
-	#TODO not working
-	def test_rebalance(self):
+	def test_rotate(self):
 		# insert root
 		root_message = protocol.ClientMessage()
 		root_message.insert(None, 5, 'left')
@@ -91,13 +90,11 @@ class TestServer(unittest.TestCase):
 		self.assertEqual(3, server.subtree_size(self.s.root))
 
 		server.right_rotate(self.s.root)
-		# self.assertEqual(4, server_message_3.ciphertext)
-		self.assertEqual(5, self.s.root.value)
-		self.assertEqual(4, self.s.root.parent.value)
-		self.assertEqual(4, self.s.root.right.value)
+		server.Server.update_root(self.s)
+		self.assertEqual(4, self.s.root.value)
+		self.assertEqual(5, self.s.root.right.value)
 		self.assertEqual(3, self.s.root.left.value)
 		self.assertEqual(3, server.subtree_size(self.s.root))
-		self.assertEqual(4, self.s.root.right.value)
 
 if __name__ == '__main__':
 	unittest.main()
