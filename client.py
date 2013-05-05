@@ -51,19 +51,23 @@ class Client:
                     return self._insert(current_node, original_ciphertext, "right")
 
     def _get_root(self):
-        client_message = protocol.ClientMessage().get_root()
+        client_message = protocol.ClientMessage()
+        client_message.get_root()
         return self._send_client_message(client_message)
 
     def _move_left(self, ciphertext):
-        client_message = protocol.ClientMessage().move_left(ciphertext)
+        client_message = protocol.ClientMessage()
+        client_message.move_left(ciphertext)
         return self._send_client_message(client_message)
 
     def _move_right(self, ciphertext):
-        client_message = protocol.ClientMessage().move_right(ciphertext)
+        client_message = protocol.ClientMessage()
+        client_message.move_right(ciphertext)
         return self._send_client_message(client_message)
 
     def _insert(self, current_ciphertext, new_ciphertext, direction):
-        client_message = protocol.ClientMessage().insert(current_ciphertext, new_ciphertext, direction)
+        client_message = protocol.ClientMessage()
+        client_message.insert(current_ciphertext, new_ciphertext, direction)
         return self._send_client_message(client_message)
 
     # Communicate with the server and get back the +ciphertext+ that the

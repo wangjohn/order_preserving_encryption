@@ -1,4 +1,4 @@
-import protocol
+import protocol, communication_channel, client, time
 
 class Server:
 
@@ -41,6 +41,14 @@ class Server:
         self.root = None
         self.learner = Server.MachineLearner()
         self.communication_channel = communication_channel
+
+    def run(self):
+        while True:
+            if self.communication_channel.get():
+                message = self.communication_channel.get()
+                self.receive(message)
+            else:
+                time.sleep(10)
 
     '''
     Server response to a client message.
@@ -187,8 +195,6 @@ def rebalance(node):
         elif balance_factor(node.left) == -1: # left-right case
             left_rotate(node.left)
             right_rotate(node)
-
-
 
 
 
