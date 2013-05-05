@@ -132,6 +132,35 @@ Since a subtree containing all the ciphertexts corresponding to a plaintext $x$ 
 
 We have seen that the smallest subtree containing a repeated plaintext will be rooted at a ciphertext decrypting to that plaintext. This has a number of interesting applications. For instance, one can examine the series of decisions that are made in the RTOPE scheme by the client by examining this subtree and a smaller subtree in a recursive fashion.
 
-For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried.
+For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried. For example, if $p$ is the value of a repeated plaintext, then DCS will mutate $p$ into $p + r$ where $r \in [0,1)$ are some random bits. Moving left at the root means that $p_1 < p_r$ where $p_r$ is the root value. This means that $p + r_1 < p + r_r$ which is equivalent to saying $r_1 < r_r$. Thus, moving left at the root is just the probability that the random number $r_1$ is smaller than the random number $r_r$ picked at the root.
+
+  Now let us examine some series of moves down the tree when attempting to query or insert some node with plaintext value $x$, denoted by the sequence
+  \begin{eqnarray}
+    \{m_0(x), m_1(x), m_2(x), \ldots, m_k(x)\}
+  \end{eqnarray}
+
+  We shall drop the $x$ for convenience and commonly refer to the moves as $m_i$. We see that $m_i$ can take on two possibilities, left $0$ or right $1$, and we can characterize the moves:
+  \begin{eqnarray}
+    m_i(x) = \left\{ \begin{array}{l l}
+        0 & \textrm{if } p_i > x \\
+        1 & \textrm{if } p_i < x
+      \end{array} \right.
+  \end{eqnarray}
+
+  Where $p_i$ is the plaintext value of the node on the $i$th move.
+
+  We shall proceed to show that the two schemes are identical as the number of repetitions increases to infinity.
+
+  \begin{theorem}
+    DCS and ROPTE are equivalent when the number of repetitions of each distinct repeated value tends to infinity.
+  \end{theorem}
+  \begin{proof}
+    We shall prove this theorem by examining a sequence of moves when looking at the insertion of the $n$th repeated value. If we can show that the probability of traversing the tree in a particular sequence $\{m_i\}_{i=0}^k$ is the same in both DCS and RTOPE, then the two schemes can be shown to be equivalent. We shall show that as $n \to \infty$, the probability of obtaining a particular sequence converges to the same value in both DCS and RTOPE.
+
+  Denote $x$ as the $n$th repeated value. In DCS, to move right so that $m_i = 1$, one must have $p_i < x$. To move left so that $m_i = 0$, one must have $p_i > x$. The probability of choosing a value $x$ to move left is just $p_i$ (probability to pick a value below $p_i$) and moving right is $1 - p_i$ (probability to pick a value above $p_i$). Thus, the probability of making move $m_i$ is $(1 - m_i) p_i + m_i (1 - p_i)$.
+
+  
+
+\end{proof}
 
 \end{document}
