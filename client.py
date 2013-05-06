@@ -84,13 +84,7 @@ class Client:
         self.communication_channel.put(client_message)
         server_message = self.communication_channel.get()
         root_ciphertext = server_message.ciphertext
-<<<<<<< HEAD
-
         decrypted_text = self.encryption_scheme.decrypt(self.key, root_ciphertext)
         if self.dcs_scheme:
             decrypted_text = self.dcs_scheme.decrypt(decrypted_text)
         return decrypted_text
-=======
-        return self.encryption_scheme.decrypt(self.key, root_ciphertext)
-
->>>>>>> client tests
