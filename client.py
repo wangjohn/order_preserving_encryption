@@ -85,8 +85,13 @@ class Client:
         print "client's send queue size:", self.communication_channel._send_queue.qsize()
         server_message = self.communication_channel.get()
         root_ciphertext = server_message.ciphertext
+<<<<<<< HEAD
 
         decrypted_text = self.encryption_scheme.decrypt(self.key, root_ciphertext)
         if self.dcs_scheme:
             decrypted_text = self.dcs_scheme.decrypt(decrypted_text)
         return decrypted_text
+=======
+        return self.encryption_scheme.decrypt(self.key, root_ciphertext)
+
+>>>>>>> client tests
