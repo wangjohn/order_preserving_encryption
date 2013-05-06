@@ -2,6 +2,10 @@ import os, sys, math, random
 from decimal import *
 from bitarray import bitarray
 
+'''
+This isn't really encryption, but rather preprocessing on the plaintext
+to prevent against distribution attacks.
+'''
 class DistributionConfidentialityScheme:
 
 	def __init__(self):
