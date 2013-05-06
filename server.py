@@ -1,4 +1,4 @@
-import protocol, communication_channel, client, time
+import protocol, communication_channel, client, time, threading
 
 class Server:
 
@@ -43,12 +43,10 @@ class Server:
         self.communication_channel = communication_channel
 
     def run(self):
-        while True:
-            if self.communication_channel.get():
-                message = self.communication_channel.get()
-                self.receive(message)
-            else:
-                time.sleep(10)
+        if self.communication_channel.get():
+            message = self.communication_channel.get()
+            self.receive(message)
+        threading.Timer(10, self.run()).start()
 
     '''
     Server response to a client message.
