@@ -1,10 +1,12 @@
-import encryption, protocol, random
+import encryption, protocol, random, dcs
 
 class Client:
-    def __init__(self, communication_channel):
+    def __init__(self, communication_channel, dcs=False):
         self.encryption_scheme = encryption.BasicEncryptionScheme()
         self.key = self.encryption_scheme.generate_key()
         self.communication_channel = communication_channel
+        if dcs:
+            self.dcs_scheme = dcs.DistributionConfidentialityScheme()
 
     def query(self, message):
         ciphertext = self.encryption_scheme.encrypt(self.key, message)
@@ -17,6 +19,8 @@ class Client:
     # ciphertext, and this ciphertext will be stored at the server in an order
     # preserving manner.
     def insert_message(self, message):
+        if self.dcs_scheme:
+            message = self.dcs_scheme.encrypt(message)
         original_ciphertext = self.encryption_scheme.encrypt(self.key, message)
         previous_ciphertext = None
         current_ciphertext = self._get_root()
@@ -44,11 +48,15 @@ class Client:
                 current_ciphertext = self._move_right(current_ciphertext)
 
             else:
-                # Randomly choose which side to insert on.
-                if random.random() > .5:
+                # Randomly choose which side to insert on, unless dcs is enabled
+                if self.dcs_scheme:
                     return self._insert(current_node, original_ciphertext, "left")
                 else:
-                    return self._insert(current_node, original_ciphertext, "right")
+                    if random.random() > .5:
+                        return self._insert(current_node, original_ciphertext, "left")
+                    else:
+                        return self._insert(current_node, original_ciphertext, "right")
+
 
     def _get_root(self):
         client_message = protocol.ClientMessage()
@@ -78,5 +86,7 @@ class Client:
         server_message = self.communication_channel.get()
         root_ciphertext = server_message.ciphertext
 
-        return self.encryption_scheme.decrypt(self.key, root_ciphertext)
-
+        decrypted_text = self.encryption_scheme.decrypt(self.key, root_ciphertext)
+        if self.dcs_scheme:
+            decrypted_text = self.dcs_scheme.decrypt(decrypted_text)
+        return decrypted_text
