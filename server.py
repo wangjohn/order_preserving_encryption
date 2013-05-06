@@ -46,7 +46,7 @@ class Server:
         if self.communication_channel.get():
             message = self.communication_channel.get()
             self.receive(message)
-        threading.Timer(10, self.run()).start()
+        threading.Timer(1, self.run()).start()
 
     '''
     Server response to a client message.
