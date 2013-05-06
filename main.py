@@ -8,21 +8,13 @@ client_channel = factory.build_for("client")
 client = client.Client(client_channel)
 server = server.Server(server_channel)
 
-print "initialized"
-
 def client_function(inputs):
-    while True:
-        print "looping client function"
-        if (inputs):
-            print "sending", inputs[0], "to server"
-            client.insert_message(inputs[0])
-            inputs = inputs[1:]
+    for current_input in inputs:
+        print "Inserting input %s" % current_input
+        client.insert_message(current_input)
 
 def server_function():
     while True:
-        print "looping server function"
-        print server.communication_channel._send_queue.qsize()
-        print server.communication_channel._receive_queue.qsize()
         server.run()
 
 

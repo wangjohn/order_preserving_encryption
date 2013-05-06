@@ -44,9 +44,7 @@ class Server:
 
     def run(self):
         message = self.communication_channel.get()
-        if message:
-            print "receiving message"
-            self.receive(message)
+        self.receive(message)
 
     def start(self):
         threading.Timer(1, self.run()).start()

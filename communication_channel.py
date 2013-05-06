@@ -36,7 +36,7 @@ class CommunicationChannel:
 
     def put(self, message):
         message.message_type._check_valid_message_type()
-        self._send_queue.put(message)
+        return self._send_queue.put(message)
 
     def get(self):
-        self._receive_queue.get()
+        return self._receive_queue.get()

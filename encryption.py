@@ -7,7 +7,7 @@ class BasicEncryptionScheme:
         return message
 
     def decrypt(self, key, ciphertext):
-        return message
+        return ciphertext
 
     def generate_key(self):
         return "I'm in da hooooood! bitches"

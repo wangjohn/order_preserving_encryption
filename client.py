@@ -74,7 +74,6 @@ class Client:
     # server responds with
     def _send_client_message(self, client_message):
         self.communication_channel.put(client_message)
-        print "client's send queue size:", self.communication_channel._send_queue.qsize()
         server_message = self.communication_channel.get()
         root_ciphertext = server_message.ciphertext
 
