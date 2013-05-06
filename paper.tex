@@ -85,9 +85,11 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, one can show the equivalence of RTOPE and DCS in terms of the OPE encodings that both provide.
 
-  \subsection{Equivalence of RTOPE and DCS}
+\section{Equivalence of DCS and RTOPE}
 
-  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. Formally, we define equivalence as follows:
+  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. We will now formally define equivalence.
+
+  \subsection{Equivalence}
 
   \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
 
@@ -105,6 +107,8 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
 \end{proof}
+
+  \subsection{Equivalence of DCS and RTOPE}
 
 We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
 
