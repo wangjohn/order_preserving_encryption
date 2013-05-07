@@ -18,7 +18,7 @@ def server_function():
     while True:
         server.run()
 
-NUM_INPUTS = 50
+NUM_INPUTS = 5
 LEN_INPUTS = 4
 inputs = []
 for i in range(NUM_INPUTS):
@@ -27,7 +27,7 @@ for i in range(NUM_INPUTS):
         inp += str(int(random.random()*2))
     inputs.append(inp)
 
-inputs = ["0001"]
+#inputs = ["0001"]
 print "Program inputs:", inputs
 
 client_thread = Thread(target=client_function, args=(inputs,))

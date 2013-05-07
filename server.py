@@ -130,7 +130,7 @@ def subtree_size(node):
     elif node.right is None:
         return 1 + subtree_size(node.left)
     else:
-        return 1 + sum[subtree_size(node.left), subtree_size(node.right)] 
+        return 1 + subtree_size(node.left) + subtree_size(node.right)
 
 def counter(fn):
     def wrapper(*args, **kwargs):
