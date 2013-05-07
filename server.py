@@ -1,4 +1,4 @@
-import protocol
+import protocol, communication_channel, client, time, threading
 
 class Server:
 
@@ -42,6 +42,13 @@ class Server:
         self.learner = Server.MachineLearner()
         self.communication_channel = communication_channel
 
+    def run(self):
+        message = self.communication_channel.get()
+        self.receive(message)
+
+    def start(self):
+        threading.Timer(1, self.run()).start()
+
     '''
     Server response to a client message.
     '''
@@ -70,6 +77,7 @@ class Server:
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("insert").__repr__()):
             new_node = Server.OPE_Node(client_message.new_ciphertext)
+            print "Server insert, new_ciphertext="+str(client_message.new_ciphertext)
             # root case
             if client_message.ciphertext == None:
                 self.root = new_node
@@ -86,6 +94,7 @@ class Server:
                 while (node and node.parent):
                     rebalance(node.parent)
                     node = node.parent 
+                self.update_root()
             server_message = protocol.ServerMessage(ciphertext=client_message.new_ciphertext, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("query").__repr__()):
@@ -94,6 +103,10 @@ class Server:
         
         self.communication_channel.put(server_message)
         return server_message
+
+    def update_root(self):
+        while (self.root.parent != None):
+            self.root = self.root.parent
 
 '''
 These functions handle a rebalance of the tree upon insertion of a node. 
@@ -150,16 +163,18 @@ def left_rotate(node):
     A.parent = B #5 - 4 - 3
     A.right = B.left # 3 right - None
     B.left = A # 4 left - 3
-    B.parent.left = B
+    if B.parent:
+        B.parent.left = B
 
 def right_rotate(node):
-    A = node 
-    B = node.left 
-    B.parent = A.parent
-    A.parent = B
-    A.left = B.right
-    B.right = A
-    B.parent.right = B
+    A = node # 5
+    B = node.left # 4
+    B.parent = A.parent # 4 is root
+    A.parent = B # 4 - 5
+    A.left = B.right # 5 has no children
+    B.right = A 
+    if B.parent:
+        B.parent.right = B
 
 '''
 rebalance.heights will return the subtree_sizes of every rebalance,
@@ -168,6 +183,7 @@ len(rebalance.heights) is the number of rebalances.
 '''
 @counter
 def rebalance(node):
+    print "rebalancing"
     if balance_factor(node) == -2:
         if balance_factor(node.right) == -1: # right-right case
             left_rotate(node)
@@ -180,9 +196,6 @@ def rebalance(node):
         elif balance_factor(node.left) == -1: # left-right case
             left_rotate(node.left)
             right_rotate(node)
-
-
-
 
 
 

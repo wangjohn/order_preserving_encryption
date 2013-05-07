@@ -59,7 +59,7 @@ The adversary shall win the game if its guess is correct $b' = b$ and the sets h
 \subsection{Security of DCS}
 
 \begin{theorem}
-  DCS is IND-CPDA secure.
+  DCS is IND-CPDA secure 
 \end{theorem}
 \begin{proof}
 We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sequences of size $\lambda$.
@@ -81,9 +81,15 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   This scheme is a simple extension of Popa et al (2013)'s scheme and handles repeated values. In RTOPE, the server cannot tell how many values are repeated, and what the distribution of repeated values looks like.
 
-  \subsection{Equivalence of RTOPE and DCS}
+  \subsection{Security of RTOPE}
 
-  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. Formally, we define equivalence as follows:
+  RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, one can show the equivalence of RTOPE and DCS in terms of the OPE encodings that both provide.
+
+\section{Equivalence of DCS and RTOPE}
+
+  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. We will now formally define equivalence.
+
+  \subsection{Equivalence}
 
   \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
 
@@ -101,6 +107,8 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
 \end{proof}
+
+  \subsection{Equivalence of DCS and RTOPE}
 
 We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
 
@@ -128,66 +136,6 @@ Since a subtree containing all the ciphertexts corresponding to a plaintext $x$ 
 
 We have seen that the smallest subtree containing a repeated plaintext will be rooted at a ciphertext decrypting to that plaintext. This has a number of interesting applications. For instance, one can examine the series of decisions that are made in the RTOPE scheme by the client by examining this subtree and a smaller subtree in a recursive fashion.
 
-For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried. For example, if $p$ is the value of a repeated plaintext, then DCS will mutate $p$ into $p + r$ where $r \in [0,1)$ are some random bits. Moving left at the root means that $p_1 < p_r$ where $p_r$ is the root value. This means that $p + r_1 < p + r_r$ which is equivalent to saying $r_1 < r_r$. Thus, moving left at the root is just the probability that the random number $r_1$ is smaller than the random number $r_r$ picked at the root.
-
-  Now let us examine some series of moves down the tree when attempting to query or insert some node with plaintext value $x$, denoted by the sequence
-  \begin{eqnarray}
-    \{m_0(x), m_1(x), m_2(x), \ldots, m_k(x)\}
-  \end{eqnarray}
-
-  We shall drop the $x$ for convenience and commonly refer to the moves as $m_i$. We see that $m_i$ can take on two possibilities, left $0$ or right $1$, and we can characterize the moves:
-  \begin{eqnarray}
-    m_i(x) = \left\{ \begin{array}{l l}
-        0 & \textrm{if } p_i > x \\
-        1 & \textrm{if } p_i < x
-      \end{array} \right.
-  \end{eqnarray}
-
-  Where $p_i$ is the plaintext value of the node on the $i$th move.
-
-  We shall proceed to show that the two schemes are actually identical. In order to do this, we need to first prove a lemma.
-  \begin{lemma}
-    Let $\{ x_i \}_{i=1}^n$ be a sequence of $n$ independent uniform random variables chosen from the interval $[0,1)$. Let $x_{n+1}$ be another uniform random variable on the interval $[0,1)$. The probability that $x_{n+1}$ is the $j$th smallest item is $1/(n+1)$.
-  \end{lemma}
-  \begin{proof}
-    For the proof, we rely on the fact that the $n$ random variables are independent. We note that the $n+1$ random variable can be thought of as the next random variable in the sequence. Moreover, since all of the random variables are identically drawn from the same uniform distribution, we see that we are really drawing from a sequence of $n+1$ uniform random variables which can be chosen at the same time.
-
-    It is clear that the probability of any $x_i$ being the $j$th smallest item is the same, because all of the random variables are drawn independently. This means that $Pr[x_{n+1} = X_{j}]$ where $X_j$ is the $j$th smallest item can be given by the expression:
-    \begin{eqnarray}
-      Pr[x_{n+1} = X_{j}] = Pr[x_{n} = X_{j} = \ldots = Pr[x_1 = X{j}]
-    \end{eqnarray}
-
-    Since exactly one $x_{i}$ is the $j$th smallest element, we see that $\sum_{i} Pr[x_i = X_j] = 1$. This implies that $Pr[x_i = X_j] = 1/(n+1)$, which further implies that $Pr[x_{n+1} = X_j] = 1/(n+1)$. This completes the proof.
-  \end{proof}
-
-  This lemma allows us to show that DCS and RTOPE have identical move distributions, and thus are actually equivalent.
-
-  \begin{theorem}
-    DCS and ROPTE are equivalent.
-  \end{theorem}
-  \begin{proof}
-    We shall prove this theorem by examining a sequence of moves when looking at the insertion of a repeated value. If we can show that the probability of traversing the tree in a particular sequence $\{m_i\}_{i=1}^k$ is the same in both DCS and RTOPE, then the two schemes can be shown to be equivalent. We shall show that as $n \to \infty$, the probability of obtaining a particular sequence converges to the same value in both DCS and RTOPE.
-
-  Denote $x$ as the repeated value to insert. In DCS, to move right so that $m_i = 1$, one must have $p_i < x$. To move left so that $m_i = 0$, one must have $p_i > x$. Although there exists a sequence of moves from the root to a leaf of the tree which includes every node in the tree, we need only examine the nodes which have a plaintext value equal to $x$. This is because the traversal of DCS and RTOPE is the same for nodes which are not repeated (they share the normal binary tree traversal rule). Thus, we know that the moves in these cases will be equivalent and that the probability of making the moves on non-repeated nodes will be equal.
-
-  Thus, we can reduce our problem to considering a sequence of moves $\{m_i\}_{i=0}^k$ on the plaintext values which are equal to $x$. If we can show that the probability of making a particular sequence of moves on the repeated values is the same for DCS and RTOPE, then we will be done. Making any sequence of moves on repeated values in RTOPE will have probability $2^{-k}$ where $k$ is the number of repeated values in the sequence. This is because one moves left or right with probability $\frac{1}{2}$.
-
-  Now, we shall examine the sequence of moves in RTOPE. Recall that we only need to consider a sequence of moves $\{m_i\}_{i=0}^k$ which is performed on a single repeated plaintext value $x$. This means that in RTOPE, the plaintext values will be distinguished by the random bit $r_i$ so that $p_{i} = x + r_i$. Therefore, we need only compare $r_i$ to the value $x + r_{k+1}$ that we are querying. 
-
-  However, notice that $\{r_i\}_{i=1}^k$ is a sequence of $k$ independent uniform random variables chosen from the interval $[0,1)$. Moreover, $r_{k+1}$ is chosen from the same interval and is also an independently drawn uniform random variable. This means, that the probability that $r_{k+1}$ is the $i$th smallest element is $1/(k+1)$. Therefore, it is equally probable that the next move $x$ ends up going through any sequence of moves down the tree. This follows because each rank corresponds to a different path through the tree, and a different sequence of moves. Thus, each sequence $\{m_i\}_{i=1}^k$ is equally probable. Since there are $2^k$ different possible sequences, the probability of going down any such sequence is $2^{-k}$, which is the same probability as in RTOPE.
-
-    Thus, we have shown that the probability of inserting a new repeated element of $x$ in any direction gives the same probability distribution in both DCS and RTOPE. Since the insertion of a non-repeated element will give rise to the same tree, if the tree was the same before, we see that the probability of obtaining a particular OPE encoding is the same in both DCS and RTOPE. Thus, we can take the bijective mapping $f(x) = x$ to use in the definition of equivalence. It is then clear that $Pr[Encode_{DCS}(c_i) = \omega] = Pr[Encode_{RTOPE}(c_i) = \omega]$ for all $\omega \in \mathrm{Z}_x$. This proves equivalence.
-\end{proof}
-
-  \subsection{Security of RTOPE}
-
-  RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, now that we have shown that DCS is IND-CPDA secure and that RTOPE and DCS are equivalent, proving the security of RTOPE is trivial. We have already seen that the equivalence of two schemes imply that one is secure if and only if the other is secure. Thus, we can prove the theorem:
-
-  \begin{theorem}
-    RTOPE is IND-CPDA secure.
-  \end{theorem}
-  \begin{proof}
-    We have shown that RTOPE and DCS are equivalent. We have also shown that if $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure. Since we have shown that DCS is IND-CPDA secure, we see that RTOPE is also IND-CPDA secure.
-  \end{proof}
+For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried.
 
 \end{document}

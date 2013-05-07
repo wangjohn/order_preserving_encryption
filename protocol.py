@@ -25,6 +25,7 @@ class ServerMessage(MessageProtocol):
 #   get_root
 #   insert
 #   query
+#   None
 #
 # Once one of these messages is called, the message will be automatically
 # configured with the correct +MessageType+
@@ -58,9 +59,8 @@ class ClientMessage(MessageProtocol):
         self.message_type = MessageType("query")
         self.ciphertext = ciphertext
 
-    #TODO what about for the root?
     def _check_insert_direction(self):
-        if not (self.insert_direction == 'left' or self.insert_direction == 'right'):
+        if not (self.insert_direction == 'left' or self.insert_direction == 'right' or self.insert_direction == None):
            raise Exception("'%s' is not a valid insert direction" % self.insert_direction)
 
 # Class that wraps valid message types that are passed from the client to the
