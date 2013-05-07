@@ -27,6 +27,7 @@ for i in range(NUM_INPUTS):
         inp += str(int(random.random()*2))
     inputs.append(inp)
 
+inputs = ["0001"]
 print "Program inputs:", inputs
 
 client_thread = Thread(target=client_function, args=(inputs,))
