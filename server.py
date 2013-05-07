@@ -49,6 +49,18 @@ class Server:
     def start(self):
         threading.Timer(1, self.run()).start()
 
+    # HACK that allows us to use DCS with the fake OPE table. Actually 
+    # just compares the "plaintext" portions of the ciphertext. Will
+    # break with a real encryption scheme -- use real OPE tables!
+    def DCS_hack(self, client_message):
+        if client_message.ciphertext not in self.fake_ope_table.keys():
+            for key in self.fake_ope_table.keys():
+                if key[:5] == client_message.ciphertext[:5]:
+                    current = self.fake_ope_table[key]
+        else:
+            current = self.fake_ope_table[client_message.ciphertext]
+        return current or None
+
     '''
     Server response to a client message.
     '''
@@ -57,14 +69,16 @@ class Server:
         self.learner.process_message(client_message)
 
         if (client_message.message_type.__repr__() == protocol.MessageType("move_left").__repr__()):
-            left_child = self.fake_ope_table[client_message.ciphertext].left
+            current = self.DCS_hack(client_message)
+            left_child = current.left
             if left_child:
                 server_message = protocol.ServerMessage(ciphertext=left_child.value, client_message=client_message)
             else:
                 server_message = protocol.ServerMessage(ciphertext=None, client_message=client_message)
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("move_right").__repr__()):
-            right_child = self.fake_ope_table[client_message.ciphertext].right
+            current = self.DCS_hack(client_message)
+            right_child = current.right
             if right_child:
                 server_message = protocol.ServerMessage(ciphertext=right_child.value, client_message=client_message)
             else:
@@ -84,7 +98,8 @@ class Server:
                 self.root = new_node
                 self.fake_ope_table[client_message.new_ciphertext] = self.root
             else:
-                node = self.fake_ope_table[client_message.ciphertext]
+                node = self.DCS_hack(client_message)
+                #node = self.fake_ope_table[client_message.ciphertext]
                 new_node.parent = node
                 if (client_message.insert_direction == "left"):
                     node.left = new_node
@@ -108,6 +123,17 @@ class Server:
     def update_root(self):
         while (self.root.parent != None):
             self.root = self.root.parent
+
+    def pad(self, value):
+        if (len(value) < ENC_LEN):
+            value += "1"
+        while (len(value) < ENC_LEN):
+            value += "0"
+        return value
+
+    def unpad(self, value):
+        r = value.rfind("1")
+        return value[:r]
 
 '''
 These functions handle a rebalance of the tree upon insertion of a node. 
