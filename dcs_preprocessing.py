@@ -17,6 +17,9 @@ class DistributionConfidentialityScheme:
 
 
 	def encrypt(self, plaintext):
+
+		if not plaintext:
+			return None
 	
 		modified_plaintext = plaintext
 		modification_bit_count = bin(0)[2:].zfill(self.q)
@@ -31,7 +34,18 @@ class DistributionConfidentialityScheme:
 
 		return ciphertext
 
+	# These two functions return the minimum possible encodings of plaintexts.
+	# They are used as upper and lower bounds on a number for executing range queries.
+	def encrypt_min(self, plaintext):
+		pass
+
+	def encrypt_max(self, plaintext):
+		pass
+
 	def decrypt(self, ciphertext):
+
+		if not ciphertext:
+			return None
 		
 		non_random_ciphertext =  ciphertext[:len(ciphertext) - self.r]
 		modified_plaintext = non_random_ciphertext[:len(non_random_ciphertext) - self.q]

@@ -53,6 +53,7 @@ class Server:
     Server response to a client message.
     '''
     def receive(self, client_message):
+        #print "KEYS: " + str(self.fake_ope_table)
         self.learner.process_message(client_message)
 
         if (client_message.message_type.__repr__() == protocol.MessageType("move_left").__repr__()):
@@ -177,13 +178,15 @@ def right_rotate(node):
         B.parent.right = B
 
 '''
-rebalance.heights will return the subtree_sizes of every rebalance,
-allowing us to figure out the speed of our insertion procedure.
-len(rebalance.heights) is the number of rebalances.
+rebalance.subtree_sizes will return the subtree_sizes of every rebalance,
+allowing us to figure out the speed of our insertion procedure (since each
+rebalance needs to re-encode each of the nodes in the subtree).
+len(rebalance.subtree_sizes) is the number of rebalances.
 '''
 @counter
 def rebalance(node):
-    print "rebalancing"
+    print "Rebalance count: " + str(rebalance.subtree_sizes)
+    print "Rebalance time: " + str(sum(rebalance.subtree_sizes))
     if balance_factor(node) == -2:
         if balance_factor(node.right) == -1: # right-right case
             left_rotate(node)

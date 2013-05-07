@@ -39,6 +39,8 @@ class ClientMessage(MessageProtocol):
         self.ciphertext = None
         self.new_ciphertext = None
         self.insert_direction = None
+        self.min_ciphertext = None
+        self.max_ciphertext = None
 
     def move_left(self, ciphertext):
         self.message_type = MessageType("move_left")
@@ -62,6 +64,11 @@ class ClientMessage(MessageProtocol):
         self.message_type = MessageType("query")
         self.ciphertext = ciphertext
 
+    def range_query(self, min_ciphertext, max_ciphertext):
+        self.message_type = MessageType("range_query")
+        self.min_ciphertext = min_ciphertext
+        self.max_ciphertext = max_ciphertext
+
     def _check_insert_direction(self):
         if not (self.insert_direction == 'left' or self.insert_direction == 'right' or self.insert_direction == None):
            raise Exception("'%s' is not a valid insert direction" % self.insert_direction)
@@ -70,7 +77,6 @@ class ClientMessage(MessageProtocol):
 # server. It contains a whitelist of valid message types. Checking the type of
 # the object is as easy as checking +type+ on the object.
 class MessageType:
-    valid_message_types = ["move_left", "move_right", "get_root", "insert", "query"]
 
     def __init__(self, message_type):
         self._message_type = message_type
@@ -83,5 +89,5 @@ class MessageType:
         return self._message_type        
 
     def _check_valid_message_type(self):
-        if self._message_type not in ["move_left", "move_right", "get_root", "insert", "query"]:
+        if self._message_type not in ["move_left", "move_right", "get_root", "insert", "query", "range_query"]:
             raise Exception("'%s' is not a valid message type" % message_type)

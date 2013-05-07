@@ -1,4 +1,4 @@
-import encryption, protocol, random, dcs
+import encryption, protocol, random, dcs_preprocessing
 
 class Client:
     def __init__(self, communication_channel, dcs=False):
@@ -6,14 +6,26 @@ class Client:
         self.key = self.encryption_scheme.generate_key()
         self.communication_channel = communication_channel
         if dcs:
-            self.dcs_scheme = dcs.DistributionConfidentialityScheme()
+            self.dcs_scheme = dcs_preprocessing.DistributionConfidentialityScheme()
         else:
             self.dcs_scheme = False
 
     def query(self, message):
+        if self.dcs_scheme:
+            message = self.dcs_scheme.encrypt(message)
         ciphertext = self.encryption_scheme.encrypt(self.key, message)
         client_message = protocol.ClientMessage()
         client_message.query(ciphertext)
+        return self._send_client_message(client_message)
+
+    def range_query(self, min_message, max_message):
+        if self.dcs_scheme:
+            min_message = self.dcs_scheme.encrypt_min(min_message)
+            max_message = self.dcs_scheme.encrypt_min(max_message)
+        min_ciphertext = self.encryption_scheme.encrypt(self.key, min_message)
+        max_ciphertext = self.encryption_scheme.encrypt(self.key, max_message)
+        client_message = protocol.ClientMessage()
+        client_message.range_query(ciphertext)
         return self._send_client_message(client_message)
 
     # Stores a plaintext message +message+ in the database by communicating and
@@ -21,8 +33,6 @@ class Client:
     # ciphertext, and this ciphertext will be stored at the server in an order
     # preserving manner.
     def insert_message(self, message):
-        if self.dcs_scheme:
-            message = self.dcs_scheme.encrypt(message)
         original_ciphertext = self.encryption_scheme.encrypt(self.key, message)
         previous_ciphertext = None
         current_ciphertext = self._get_root()
@@ -33,7 +43,6 @@ class Client:
             if current_ciphertext == None:
                 if previous_ciphertext == None:
                     # Create a new root since there was no previous root.
-                    print "inserting root"
                     return self._insert(None, original_ciphertext, None)
                 else:
                     # Insert the original ciphertext, using the previous
@@ -67,16 +76,23 @@ class Client:
         return self._send_client_message(client_message)
 
     def _move_left(self, ciphertext):
+        if self.dcs_scheme:
+            ciphertext = self.dcs_scheme.encrypt(ciphertext)
         client_message = protocol.ClientMessage()
         client_message.move_left(ciphertext)
         return self._send_client_message(client_message)
 
     def _move_right(self, ciphertext):
+        if self.dcs_scheme:
+            ciphertext = self.dcs_scheme.encrypt(ciphertext)
         client_message = protocol.ClientMessage()
         client_message.move_right(ciphertext)
         return self._send_client_message(client_message)
 
     def _insert(self, current_ciphertext, new_ciphertext, direction):
+        if self.dcs_scheme:
+            current_ciphertext = self.dcs_scheme.encrypt(current_ciphertext)
+            new_ciphertext = self.dcs_scheme.encrypt(new_ciphertext)
         print "Client insert, current_ciphertext="+str(current_ciphertext)+", new_ciphertext:"+str(new_ciphertext)+", direction:"+str(direction)
         client_message = protocol.ClientMessage()
         client_message.insert(current_ciphertext, new_ciphertext, direction)
