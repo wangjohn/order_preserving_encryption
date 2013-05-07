@@ -24,6 +24,24 @@ Hrishikesh Joshi, Max Kolysh, Mari Miyachi, John Wang}
 
 \maketitle
 
+\section{Distribution Confidentiality Scheme}
+
+In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Raluca et al (2013)'s original mOPE scheme, but adds an additional layer of security.
+
+In essence, the DCS scheme adds random bits to the end of a plaintext so that the ciphertext values are randomized. This will prevent the server from being able to identify the number of times a repeated plaintext value is inserted.
+
+\subsection{Description of DCS}
+
+This section will give a formal description of DCS. We will first describe the basic version of the scheme, then we will augment it so that decimal numbers can be represented as well.
+
+In the basic version of the scheme, let us assume that we want to encrypt some plaintext value $x \in \mathrm{Z}$ and send it to the server like in Raluca et al (2013)'s mOPE scheme. For DCS, there is an additional parameter $\rho$ which will govern the probability with which the server sees a repeated value. We will generate a random value $r \in [0,1)$ which contains $\rho$ bits, denoted $r_{\rho}$, and append it to the end of $x$. The resulting value $x' = x + r_{\rho}$ will be encrypted with DET. Raluca et al (2013)'s mOPE scheme will work the same as before, but now acting on $x'$.
+
+When the client attempts to query for $x$, he must perform a range query for $[x, x+1)$ on the server.
+
+\subsection{Querying Under DCS}
+
+
+
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
 
 This security definition consists of two phases of interaction between the adversary and the challenger.
@@ -75,7 +93,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
 \section{Random Tiebreaking Order Preserving Encryption (RTOPE)}
 
-  Consider a simple tie-breaking rule on top of Popa et al (2013)'s mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability.
+  Consider a simple tie-breaking rule on top of Popa et al (2013)'s mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability. Note that in this scheme, we will use a randomized encryption scheme so that the server cannot tell if two plaintext values are the same.
 
   To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process.
 
