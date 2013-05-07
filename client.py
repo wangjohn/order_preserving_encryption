@@ -7,6 +7,8 @@ class Client:
         self.communication_channel = communication_channel
         if dcs:
             self.dcs_scheme = dcs.DistributionConfidentialityScheme()
+        else:
+            self.dcs_scheme = False
 
     def query(self, message):
         ciphertext = self.encryption_scheme.encrypt(self.key, message)

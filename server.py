@@ -77,6 +77,7 @@ class Server:
 
         elif (client_message.message_type.__repr__() == protocol.MessageType("insert").__repr__()):
             new_node = Server.OPE_Node(client_message.new_ciphertext)
+            print "Server insert, new_ciphertext="+str(client_message.new_ciphertext)
             # root case
             if client_message.ciphertext == None:
                 self.root = new_node
@@ -182,6 +183,7 @@ len(rebalance.heights) is the number of rebalances.
 '''
 @counter
 def rebalance(node):
+    print "rebalancing"
     if balance_factor(node) == -2:
         if balance_factor(node.right) == -1: # right-right case
             left_rotate(node)
@@ -194,7 +196,6 @@ def rebalance(node):
         elif balance_factor(node.left) == -1: # left-right case
             left_rotate(node.left)
             right_rotate(node)
-
 
 
 

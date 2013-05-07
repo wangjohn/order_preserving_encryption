@@ -10,4 +10,4 @@ class BasicEncryptionScheme:
         return ciphertext
 
     def generate_key(self):
-        return "I'm in da hooooood! bitches"
+        return "boo"

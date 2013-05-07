@@ -1,6 +1,5 @@
 import os, sys, math, random
 from decimal import *
-from bitarray import bitarray
 
 '''
 This isn't really encryption, but rather preprocessing on the plaintext
@@ -45,9 +44,10 @@ class DistributionConfidentialityScheme:
 		return plaintext
 		
 
-
+''''
 dcs_instance = DistributionConfidentialityScheme()
 plaintext = '1110100.0'
 ciphertext = dcs_instance.encrypt(plaintext)
 decrypted_plaintext = dcs_instance.decrypt(ciphertext)
 print "plaintext: ", plaintext, "ciphertext: ", ciphertext, "decrypted_plaintext: ", decrypted_plaintext
+'''
