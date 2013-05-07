@@ -34,7 +34,7 @@ class Client:
                 if previous_ciphertext == None:
                     # Create a new root since there was no previous root.
                     print "inserting root"
-                    return self._insert(None, current_ciphertext, None)
+                    return self._insert(None, original_ciphertext, None)
                 else:
                     # Insert the original ciphertext, using the previous
                     # ciphertext and direction.
