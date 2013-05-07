@@ -76,6 +76,7 @@ class Client:
         return self._send_client_message(client_message)
 
     def _insert(self, current_ciphertext, new_ciphertext, direction):
+        print "Client insert, current_ciphertext="+str(current_ciphertext)+", new_ciphertext:"+str(new_ciphertext)+", direction:"+str(direction)
         client_message = protocol.ClientMessage()
         client_message.insert(current_ciphertext, new_ciphertext, direction)
         return self._send_client_message(client_message)
