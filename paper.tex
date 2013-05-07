@@ -36,7 +36,18 @@ This section will give a formal description of DCS. We will first describe the b
 
 In the basic version of the scheme, let us assume that we want to encrypt some plaintext value $x \in \mathrm{Z}$ and send it to the server like in Raluca et al (2013)'s mOPE scheme. For DCS, there is an additional parameter $\rho$ which will govern the probability with which the server sees a repeated value. We will generate a random value $r \in [0,1)$ which contains $\rho$ bits, denoted $r_{\rho}$, and append it to the end of $x$. The resulting value $x' = x + r_{\rho}$ will be encrypted with DET. Raluca et al (2013)'s mOPE scheme will work the same as before, but now acting on $x'$.
 
-When the client attempts to query for $x$, he must perform a range query for $[x, x+1)$ on the server.
+Inserting in this scheme is simple, since nothing really has to be changed from Raluca et al (2013)'s mOPE scheme. The client will take the value $x$ to insert, create $x'$, then encrypt $x'$ to obtain a ciphertext. Inserting this ciphertext will involve moving down the server's binary search tree. The insertion process is started by the client acquiring the root node. The client then checks to see if $x'$ is larger or smaller than the root's decrypted value. This informs the client as to the direction in which it should move. Once it arrives at a leaf node, the client will insert the new ciphertext in the correct direction.
+
+\begin{figure}
+\lstset{language=Python}
+\begin{lstlisting}
+  TODO: Insert the insertion pseudocode here.
+\end{lstlisting}
+\caption{Pseudocode for the Insertion Algorithm}
+\label{insertion_figure}
+\end{figure}
+
+Querying, however, gets more difficult, and the next section will discuss how the client can query for some value $y$.
 
 \subsection{Querying Under DCS}
 
