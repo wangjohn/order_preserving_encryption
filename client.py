@@ -52,12 +52,12 @@ class Client:
             else:
                 # Randomly choose which side to insert on, unless dcs is enabled
                 if self.dcs_scheme:
-                    return self._insert(current_node, original_ciphertext, "left")
+                    return self._insert(current_ciphertext, original_ciphertext, "left")
                 else:
                     if random.random() > .5:
-                        return self._insert(current_node, original_ciphertext, "left")
+                        return self._insert(current_ciphertext, original_ciphertext, "left")
                     else:
-                        return self._insert(current_node, original_ciphertext, "right")
+                        return self._insert(current_ciphertext, original_ciphertext, "right")
 
 
     def _get_root(self):
