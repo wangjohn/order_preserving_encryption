@@ -18,6 +18,7 @@ class Client:
         client_message.query(ciphertext)
         return self._send_client_message(client_message)
 
+    '''
     def range_query(self, min_message, max_message):
         if self.dcs_scheme:
             min_message = self.dcs_scheme.encrypt_min(min_message)
@@ -27,6 +28,7 @@ class Client:
         client_message = protocol.ClientMessage()
         client_message.range_query(ciphertext)
         return self._send_client_message(client_message)
+    '''
 
     # Stores a plaintext message +message+ in the database by communicating and
     # interacting with the server. The plaintext will be encrypted into a

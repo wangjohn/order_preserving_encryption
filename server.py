@@ -54,10 +54,12 @@ class Server:
     # break with a real encryption scheme -- use real OPE tables!
     def DCS_hack(self, client_message):
         if client_message.ciphertext not in self.fake_ope_table.keys():
+            print "DCS HACKING"
             for key in self.fake_ope_table.keys():
                 if key[:5] == client_message.ciphertext[:5]:
                     current = self.fake_ope_table[key]
         else:
+            
             current = self.fake_ope_table[client_message.ciphertext]
         return current or None
 

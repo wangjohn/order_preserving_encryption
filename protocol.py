@@ -39,8 +39,8 @@ class ClientMessage(MessageProtocol):
         self.ciphertext = None
         self.new_ciphertext = None
         self.insert_direction = None
-        self.min_ciphertext = None
-        self.max_ciphertext = None
+        #self.min_ciphertext = None
+        #self.max_ciphertext = None
 
     def move_left(self, ciphertext):
         self.message_type = MessageType("move_left")

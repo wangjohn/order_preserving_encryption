@@ -35,11 +35,11 @@ class CommunicationChannel:
         self._receive_queue = receive_queue
 
     def put(self, message):
-        #print "QUEUE PUT: "+str(message)
+        print "QUEUE PUT: "+str(message)
         message.message_type._check_valid_message_type()
         return self._send_queue.put(message)
 
     def get(self):
         msg =  self._receive_queue.get()
-        #print "QUEUE GET: "+str(msg)
+        print "QUEUE GET: "+str(msg)
         return msg
