@@ -1,4 +1,4 @@
-import protocol, communication_channel, client, time, threading
+import protocol, communication_channel, client, time, threading, random
 
 class Server:
 
@@ -54,14 +54,19 @@ class Server:
     # break with a real encryption scheme -- use real OPE tables!
     def DCS_hack(self, client_message):
         if client_message.ciphertext not in self.fake_ope_table.keys():
-            print "DCS HACKING"
+            #print "DCS HACKING"
             for key in self.fake_ope_table.keys():
                 if key[:5] == client_message.ciphertext[:5]:
-                    current = self.fake_ope_table[key]
+                    possible_nodes = self.fake_ope_table[key]
         else:
-            
-            current = self.fake_ope_table[client_message.ciphertext]
-        return current or None
+            # another hack to get non-dcs to work. basically, when we repeat keys,
+            # we overwrite the ciphertext->node mapping in fake_ope_table. this 
+            # causes problems and makes us get stuck in an infinite loop.
+            possible_nodes = self.fake_ope_table[client_message.ciphertext]
+
+        index = int(random.random()*len(possible_nodes))
+        node = possible_nodes[index]
+        return node or None
 
     '''
     Server response to a client message.
@@ -98,16 +103,21 @@ class Server:
             # root case
             if client_message.ciphertext == None:
                 self.root = new_node
-                self.fake_ope_table[client_message.new_ciphertext] = self.root
+                if client_message.new_ciphertext in self.fake_ope_table.keys():
+                    self.fake_ope_table[client_message.new_ciphertext] += [self.root]
+                else:
+                    self.fake_ope_table[client_message.new_ciphertext] = [self.root]
             else:
                 node = self.DCS_hack(client_message)
-                #node = self.fake_ope_table[client_message.ciphertext]
                 new_node.parent = node
                 if (client_message.insert_direction == "left"):
                     node.left = new_node
                 elif (client_message.insert_direction == "right"):
                     node.right = new_node
-                self.fake_ope_table[client_message.new_ciphertext] = new_node
+                if client_message.new_ciphertext in self.fake_ope_table.keys():
+                    self.fake_ope_table[client_message.new_ciphertext] += [new_node]
+                else:
+                    self.fake_ope_table[client_message.new_ciphertext] = [new_node]
                 # AVL rebalance
                 while (node and node.parent):
                     rebalance(node.parent)
