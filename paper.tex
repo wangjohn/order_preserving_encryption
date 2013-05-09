@@ -199,12 +199,16 @@ For DCS, one can see that moving left or right from the root element depends on 
   This lemma allows us to show that DCS and RTOPE have identical move distributions, which will show that the two schemes have the same expected tree structure.
 
   \begin{theorem}
-    DCS and RTOPE are structurally expectation equivalent as the number of nodes $N$ and repetitions of value $x$, $R(x)$, both go to $\infty$, for all $x$ such that $R(x) > 1$.
+    DCS and RTOPE are not structurally expectation equivalent.
   \end{theorem}
   \begin{proof}
-    We shall prove this theorem by examining a sequence of moves when looking at the insertion of a repeated value $x$. If we can show that the probability of traversing the tree in a particular sequence $\{m_i \}_{i=1}^k$ is the same in both DCS and RTOPE when both schemes start with the same tree, then the two schemes can be shown to be structurally expectation equivalent.
-    Denote $x$ as the repeated value to insert. In DCS, to move right so that $m_i = 1$, one must have $p_i < x + r$. To move right, one must have $p_i > x + r$. Although there exists a sequence of moves from the root to a leaf of the tree which includes every node in the tree, we need only examine the nodes which have a plaintext value equal to $x$ (before the addition of the random bit). This is because the traversal of DCS and RTOPE is the same for nodes which are not repeated (they share the normal binary tree traversal rule). Thus, we know that the moves in these cases will be equivalent and the probability of making the moves on non-repeated nodes will be equal.
-    Thus, we can reduce our problem to considering a sequence of moves \{$m_i\}_{i=1}^k$ on the plaintext values which are equal to $x$. If we can show that the probability of making a particular sequence of moves on the repeated values is the same for DCS and RTOPE, then we will be done.
+    We shall prove this theorem by examining a sequence of moves when looking at the insertion of a repeated value $x$. In DCS, to move right so that $m_i = 1$, one must have $p_i < x + r$. To move left, one must have $p_i > x + r$. Although there exists a sequence of moves from the root to a leaf of the tree which includes every node in the tree, we need only examine the nodes which have a plaintext value equal to $x$ (before the addition of the random bit). This is because the traversal of DCS and RTOPE is the same for nodes which are not repeated (they share the normal binary tree traversal rule). Thus, we know that the moves in these cases will be equivalent and the probability of making the moves on non-repeated nodes will be equal.
+
+    Thus, we can reduce our problem to considering a sequence of moves \{$m_i\}_{i=1}^k$ on the plaintext values which are equal to $x$. If we can show that the probability of making a particular sequence of moves on the repeated values is the same for DCS and RTOPE, then we will be done. Making any sequence of moves on repeated values in RTOPE will have probability $2^{-k}$ where $k$ is the number of repeated value in the sequence down the tree. This is becase one moves left or right with probability $\frac{1}{2}$.
+
+    Now we shall examine the sequence of moves in DCS. Recall that we need only consider a sequence of moves $\{m_i\}^{i=1}^k$ which is performed on a single repeated plaintext value $x$. This means that in DCS, the plaintext values will be distinguished by the random bit $r_i$ so that $p_i = x + r_i$. Therefore, we need only compare $r_i$ to the value $r_{k+1}$ that we are querying.
+
+      \end{proof}
   \end{proof}
 
   \subsection{Slow Convergence}
