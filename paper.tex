@@ -114,11 +114,11 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, one can show the equivalence of RTOPE and DCS in terms of the OPE encodings that both provide.
 
-\section{Equivalence of DCS and RTOPE}
+\section{Relationship Between DCS and RTOPE}
 
   In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. We will now formally define equivalence.
 
-  \subsection{Equivalence}
+  \subsection{Expectational Equivalence}
 
   \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
 
@@ -165,6 +165,54 @@ Since a subtree containing all the ciphertexts corresponding to a plaintext $x$ 
 
 We have seen that the smallest subtree containing a repeated plaintext will be rooted at a ciphertext decrypting to that plaintext. This has a number of interesting applications. For instance, one can examine the series of decisions that are made in the RTOPE scheme by the client by examining this subtree and a smaller subtree in a recursive fashion.
 
-For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried.
+For DCS, one can see that moving left or right from the root element depends on the relative size of the root element with the new element being inserted or queried. For example, if $x$ is the value of a repeated plaintext, then DCS will mutate $p$ into $p + r$ where $r \in [0,1)$ are some random bits. Moving left at the root means that $p_1 < p_r$ where $p_r$ is the root value. This means that $p + r_1 < p + r_r$, which is equivalent to saying $r_1 < r_r$. Thus, moving left at the root is just the probability that the random number $r_1$ is smaller than the random number $r_r$ picked at the root.
+
+  Now let us examine some series of moves down the tree when attempting to query or insert some node with plaintext value $x$, denoted by the sequence
+  \begin{eqnarray}
+    \{ m_0(x), m_1(x), \ldots, m_k(x) \}
+  \end{eqnarray}
+
+  We shall drop the $x$ for convenience and commonly refer to moves as $m_i$. We see that $m_i$ can take on two possibilities, 0 for left or 1 for moving right, and we can characterize the moves:
+  \begin{eqnarray}
+    m_i(x) = \left\{ \begin{array}{l l}
+        0 & \textrm{if } p_i > x \\
+        1 & \textrm{else}
+  \end{eqnarray}
+
+  Here $p_i$ is the underlying plaintext value of the node at the $i$th move.
+
+  We shall proceed to show that the two schemes actually produce the same expected tree. In order to do this, we first prove a lemma.
+  \begin{lemma}
+    Let $\{X_i\}_{i=1}^n$ be a sequence of $n$ independent uniform random variables chosen from the interval $[0,1)$. Let $X_{n+1}$ be another uniform random varaible on the interval $[0,1)$. The probability that $x_{n+1}$ is the $j$th smallest item is $1/(n+1)$.
+  \end{lemma}
+  \begin{proof}
+    For the proof, we rely on the fact that the $n$ random variables are independent. We note that the $n+1$st random variable can be thought of as the next random variable in the sequence. Moreover, since all of the random variables are independently drawn from the same uniform distribution, we see that we are really drawing a set of $n+1$ uniform random variables which can be chosen at the same time.
+
+    It is clear that the probability of any $x_i$ being the $j$th smallest item is the same, because all of the random variables are drawn independently. This means that $Pr[X_{n+1} = S_j]$ were $S_j$ is the $j$th smallest item can be given by the expression:
+    \begin{eqnarray}
+      Pr[X_{n+1} = S_j] = Pr[X_{n} = S_j] = \ldots = Pr[X_{1} = S_j]
+    \end{eqnarray}
+
+    For all values of $j \in \{1, \ldots, n+1\}$. Since exactly one $x_i$ is the $j$th smallest element, we see that $\sum_{i=1}^{n+1} Pr[X_i = X_j] = 1$. This implies that $Pr[X_i = S_j] = 1/(n+1)$ which further implies that $Pr[X_{n+1} = S_j] = 1/(n+1)$ for all $j$. This completes the proof.
+  \end{proof}
+
+  This lemma allows us to show that DCS and RTOPE have identical move distributions, which will show that the two schemes have the same expected tree structure.
+
+
+  \begin{table}
+    \begin{tabular}{l | c | c | c | c | c | c}
+      Trials & 10 & 20 & 50 & 100 & 200 & 500 \\
+      \hline \hline
+      1000 & 0.111 & 0.122 & 0.179 & 0.249 & 0.363 & 0.537 \\
+      5000 & 0.093 & 0.062 & 0.075 & 0.104 & 0.162 & 0.241 \\
+     10000 & 0.089 & 0.059 & 0.055 & 0.071 & 0.106 & 0.176 \\
+     50000 & 0.090 & 0.047 & 0.028 & 0.037 & 0.052 & 0.077 \\
+    100000 & 0.090 & 0.047 & 0.021 & 0.026 & 0.033 & 0.059 \\
+    200000 & 0.091 & 0.047 & 0.021 & 0.018 & 0.022 & 0.040 \\
+    500000 & 0.091 & 0.047 & 0.019 & 0.013 & 0.017 & 0.025 \\
+   1000000 & 0.090 & 0.047 & 0.019 & 0.011 & 0.011 & 0.017 \\
+    \end{tabular}
+    \caption{Tests}
+  \end{table}
 
 \end{document}
