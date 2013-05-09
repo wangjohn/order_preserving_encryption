@@ -118,16 +118,16 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. We will now formally define equivalence.
 
-  \subsection{Expectational Equivalence}
+  \subsection{Structural Expectation Equivalence}
 
-  \emph{Definition:} Two OPE schemes $x,y$ are equivalent if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
+  \emph{Definition:} Two OPE schemes $x,y$ are \emph{Structural Expectation Equivalent} if for each plaintext $p_i$ that scheme $x$ encodes in a sequence of plaintexts $P = \{p_i\}_{i=1}^n$, there exists some bijective mapping $f: \mathrm{Z}_y \to \mathrm{Z}_x$ where $Pr[Encode_x(c_i) = \omega] = Pr[f(Encode_y(c_i)) = \omega]$ for all $\omega \in \mathrm{Z}_x$ where $\mathrm{Z}_x$ is the space of all possible OPE encodings for scheme $x$, $c_i = Enc(SK, p_i)$ is the ciphertext corresponding to $p_i$, and $Encode_x(c_i)$ and $Encode_y(c_i)$ are the functions that obtain the OPE encoding for schemes $x$ and $y$ respectively.
 
-  In other words, for two schemes to be equivalent, there must exist a mapping $f$ from all of the possible OPE encodings from scheme $x$ to scheme $y$, where the probability of obtaining an encoding in $x$ is the same as the probability of obtaining the corresponding encoding in $y$ (based on the mapping). This must be the case for all possible encodings.
+  In other words, for two schemes to be structurally expectation equivalent, there must exist a mapping $f$ from all of the possible OPE encodings from scheme $x$ to scheme $y$, where the probability of obtaining an encoding in $x$ is the same as the probability of obtaining the corresponding encoding in $y$ (based on the mapping). This must be the case for all possible encodings.
 
-  This notion of equivalence encompasses a number of useful features. In particular, notice that if $x$ is an OPE encoding scheme which is IND-CPDA secure, and $y$ is equivalent to $x$, then $y$ is also IND-CPDA secure. Due to this notion, it is sufficient to show the equivalence of two schemes in order to link the IND-CPDA security of the schemes (the proof of this property is given in the theorem below). Another observation one can make is that the mapping in the equivalence definition is bijective. Hence, if $x$ is equivalent to $y$, then $y$ is necessarily equivalent to $x$ because one can simply use $f^{-1}$ as the mapping, which necessarily exists because of $f$ being bijective.
+  This notion of structural expectation equivalence encompasses a number of useful features. In particular, notice that if $x$ is an OPE encoding scheme which is IND-CPDA secure, and $y$ is structurally expectation equivalent to $x$, then $y$ is also IND-CPDA secure. Due to this notion, it is sufficient to show the structural expectation equivalence of two schemes in order to link the IND-CPDA security of the schemes (the proof of this property is given in the theorem below). Another observation one can make is that the mapping in the structural expectation equivalence definition is bijective. Hence, if $x$ is structurally expectation equivalent to $y$, then $y$ is necessarily structurally expectation equivalent to $x$ because one can simply use $f^{-1}$ as the mapping, which necessarily exists because of $f$ being bijective.
 
 \begin{theorem}
- If two OPE schemes $x,y$ are equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
+ If two OPE schemes $x,y$ are structurally expectation equivalent, then $x$ is IND-CPDA secure if and only if $y$ is IND-CPDA secure.
 \end{theorem}
 \begin{proof}
   First, we observe that notion of equivalence is symmetric (since $f$ is a bijective mapping which is invertible), so that without loss of generality, we need only show that if $x$ is IND-CPDA secure, then $y$ is as well. So now we can suppose that $x$ is IND-CPDA secure and $x,y$ are equivalent schemes.
@@ -137,7 +137,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
   This means the adversary can also distinguish the mapping $Encode_x(V_i')$ from the encoding $Encode_x(W_i')$ by applying the bijective mapping $f$ (from the definition of equivalence) to obtain $Encode_x(V_i') = f(Encode_y(V_i'))$ and $Encode_x(W_i') = f(Encode_y(W_i'))$. This is a contradiction because it shows that $x$ is not IND-CPDA secure, which was one of our assumptions. Thus, we see by contradiction that $y$ must be IND-CPDA secure, which proves our result.
 \end{proof}
 
-  \subsection{Equivalence of DCS and RTOPE}
+  \subsection{Structural Expectation Equivalence of DCS and RTOPE}
 
 We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
 
@@ -198,6 +198,16 @@ For DCS, one can see that moving left or right from the root element depends on 
 
   This lemma allows us to show that DCS and RTOPE have identical move distributions, which will show that the two schemes have the same expected tree structure.
 
+  \begin{theorem}
+    DCS and RTOPE are structurally expectation equivalent as the number of nodes $N$ and repetitions of value $x$, $R(x)$, both go to $\infty$, for all $x$ such that $R(x) > 1$.
+  \end{theorem}
+  \begin{proof}
+    We shall prove this theorem by examining a sequence of moves when looking at the insertion of a repeated value $x$. If we can show that the probability of traversing the tree in a particular sequence $\{m_i \}_{i=1}^k$ is the same in both DCS and RTOPE when both schemes start with the same tree, then the two schemes can be shown to be structurally expectation equivalent.
+    Denote $x$ as the repeated value to insert. In DCS, to move right so that $m_i = 1$, one must have $p_i < x + r$. To move right, one must have $p_i > x + r$. Although there exists a sequence of moves from the root to a leaf of the tree which includes every node in the tree, we need only examine the nodes which have a plaintext value equal to $x$ (before the addition of the random bit). This is because the traversal of DCS and RTOPE is the same for nodes which are not repeated (they share the normal binary tree traversal rule). Thus, we know that the moves in these cases will be equivalent and the probability of making the moves on non-repeated nodes will be equal.
+    Thus, we can reduce our problem to considering a sequence of moves \{$m_i\}_{i=1}^k$ on the plaintext values which are equal to $x$. If we can show that the probability of making a particular sequence of moves on the repeated values is the same for DCS and RTOPE, then we will be done.
+  \end{proof}
+
+  \subsection{Slow Convergence}
 
   \begin{table}
     \begin{tabular}{l | c | c | c | c | c | c}
@@ -212,7 +222,7 @@ For DCS, one can see that moving left or right from the root element depends on 
     500000 & 0.091 & 0.047 & 0.019 & 0.013 & 0.017 & 0.025 \\
    1000000 & 0.090 & 0.047 & 0.019 & 0.011 & 0.011 & 0.017 \\
     \end{tabular}
-    \caption{Tests}
+    \caption{Average Differences of Expected and Realized Rank}
   \end{table}
 
 \end{document}
