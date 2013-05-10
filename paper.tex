@@ -39,12 +39,12 @@ In the basic version of the scheme, let us assume that we want to encrypt some p
 Inserting in this scheme is simple, since nothing really has to be changed from Raluca et al (2013)'s mOPE scheme. The client will take the value $x$ to insert, create $x'$, then encrypt $x'$ to obtain a ciphertext. Inserting this ciphertext will involve moving down the server's binary search tree. The insertion process is started by the client acquiring the root node. The client then checks to see if $x'$ is larger or smaller than the root's decrypted value. This informs the client as to the direction in which it should move. Once it arrives at a leaf node, the client will insert the new ciphertext in the correct direction.
 
 \begin{figure}
-\lstset{language=Python}
-\begin{lstlisting}
-  TODO: Insert the insertion pseudocode here.
-\end{lstlisting}
-\caption{Pseudocode for the Insertion Algorithm}
-\label{insertion_figure}
+%\lstset{language=Python}
+%\begin{lstlisting}
+%  TODO: Insert the insertion pseudocode here.
+%\end{lstlisting}
+%\caption{Pseudocode for the Insertion Algorithm}
+%\label{insertion_figure}
 \end{figure}
 
 Querying, however, gets more difficult, and the next section will discuss how the client can query for some value $y$.
@@ -177,26 +177,12 @@ For DCS, one can see that moving left or right from the root element depends on 
     m_i(x) = \left\{ \begin{array}{l l}
         0 & \textrm{if } p_i > x \\
         1 & \textrm{else}
+    \end{array} \right.
   \end{eqnarray}
 
   Here $p_i$ is the underlying plaintext value of the node at the $i$th move.
 
-  We shall proceed to show that the two schemes actually produce the same expected tree. In order to do this, we first prove a lemma.
-  \begin{lemma}
-    Let $\{X_i\}_{i=1}^n$ be a sequence of $n$ independent uniform random variables chosen from the interval $[0,1)$. Let $X_{n+1}$ be another uniform random varaible on the interval $[0,1)$. The probability that $x_{n+1}$ is the $j$th smallest item is $1/(n+1)$.
-  \end{lemma}
-  \begin{proof}
-    For the proof, we rely on the fact that the $n$ random variables are independent. We note that the $n+1$st random variable can be thought of as the next random variable in the sequence. Moreover, since all of the random variables are independently drawn from the same uniform distribution, we see that we are really drawing a set of $n+1$ uniform random variables which can be chosen at the same time.
-
-    It is clear that the probability of any $x_i$ being the $j$th smallest item is the same, because all of the random variables are drawn independently. This means that $Pr[X_{n+1} = S_j]$ were $S_j$ is the $j$th smallest item can be given by the expression:
-    \begin{eqnarray}
-      Pr[X_{n+1} = S_j] = Pr[X_{n} = S_j] = \ldots = Pr[X_{1} = S_j]
-    \end{eqnarray}
-
-    For all values of $j \in \{1, \ldots, n+1\}$. Since exactly one $x_i$ is the $j$th smallest element, we see that $\sum_{i=1}^{n+1} Pr[X_i = X_j] = 1$. This implies that $Pr[X_i = S_j] = 1/(n+1)$ which further implies that $Pr[X_{n+1} = S_j] = 1/(n+1)$ for all $j$. This completes the proof.
-  \end{proof}
-
-  This lemma allows us to show that DCS and RTOPE have identical move distributions, which will show that the two schemes have the same expected tree structure.
+  We shall proceed to show that the two schemes do not produce the same expected tree.
 
   \begin{theorem}
     DCS and RTOPE are not structurally expectation equivalent.
@@ -206,27 +192,38 @@ For DCS, one can see that moving left or right from the root element depends on 
 
     Thus, we can reduce our problem to considering a sequence of moves \{$m_i\}_{i=1}^k$ on the plaintext values which are equal to $x$. If we can show that the probability of making a particular sequence of moves on the repeated values is the same for DCS and RTOPE, then we will be done. Making any sequence of moves on repeated values in RTOPE will have probability $2^{-k}$ where $k$ is the number of repeated value in the sequence down the tree. This is becase one moves left or right with probability $\frac{1}{2}$.
 
-    Now we shall examine the sequence of moves in DCS. Recall that we need only consider a sequence of moves $\{m_i\}^{i=1}^k$ which is performed on a single repeated plaintext value $x$. This means that in DCS, the plaintext values will be distinguished by the random bit $r_i$ so that $p_i = x + r_i$. Therefore, we need only compare $r_i$ to the value $r_{k+1}$ that we are querying.
+    Now we shall examine the sequence of moves in DCS. Recall that we need only consider a sequence of moves $\{m_i\}_{i=1}^k$ which is performed on a single repeated plaintext value $x$. This means that in DCS, the plaintext values will be distinguished by the random bit $r_i$ so that $p_i = x + r_i$. Therefore, we need only compare $r_i$ to the value $r^*$, where $r^*$ is the random part of the new plaintext we are inserting.
 
-      \end{proof}
+    The probability that we make a series of moves $\{m_i\}_{i=1}^k$ is the probability that $r^*$ has the $j$ and $j+1$st smallest elements in the sequence of random values $\{ r_i\}_{i=1}^k$. Let $n = R(x)$ be the total number of repeated values of $x$.
+
+    It is well known that the probability that the $j$th smallest element falling in the interval $[u, u + du]$ is given by:
+    \begin{eqnarray}
+      \frac{n!}{(j-1)!(n-j)!} u^{j-1} (1-u)^{n-j} du
+    \end{eqnarray}
+
+    Therefore, the probability that $r^*$ falls between the $j$th and $j+1$st value is just the difference between all potential values $u_1$ of the $j$th smallest element and all potential values $u_2$ of the $j+1$st element. This is:
+    \begin{eqnarray}
+      \int_{0}^1 \int_0^{u_2} Pr[U_2 = u_2] Pr[U_1 = u_1] Pr[u_1 < r^* < u_2] d_{u_1} d_{u_2}
+    \end{eqnarray}
+
+    Where we take $U_1$ as the $j$th smallest value and $U_2$ as the $j+1$st smallest value. Thus, the probability of $r^*$ falling in that interval is the integral over all possible values of $U_2$ and $U_1$, and the probabilitiy that it falls inside of the that interval. Since $Pr[u_1 < r^* < u_2] = (u_2 - u_1)$, we can write the above as:
+
+    \begin{eqnarray}
+      \int_{0}^1 \int_0^{u_2} \left( \frac{n!}{j!(n-j-1)!} u_2^j (1 - u_2)^{n-j-1} \right) \left( \frac{n!}{(j-1)!(n-j)!} u_1^{j-1} (1 - u_1)^{n-j} \right) (u_2 - u_1) d_{u_1} d_{u_2}
+    \end{eqnarray}
+
+    Letting $C(j) = \frac{n!}{j!(n-j-1)!} \frac{n!}{(j-1)!(n-j)!}$, and integrating the epression for $u_1$, we can obtain the following result:
+    \begin{eqnarray}
+      C(j) \int_0^1 u_2^j (1 - u_2)^{n-j-1} \left( \frac{(u_2 (n+1) - j) B(j, n-j+1) + u_2^j (1-u_2)^{n-j+1}}{n+1} \right) d u_2
+    \end{eqnarray}
+
+    The above is the probability that $r^*$ falls between the $j$th and $j+1$st values. Simulating this in the figure below, it is clear that this is not uniform for all values of $j$ (like RTOPE is).
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=3in]{ball_result.png}
+      \caption{Probability of $r^*$ falling between the $j$th and $j+1$st largest values in the sequence $\{r_i\}_{i=1}^n$}
+    \end{figure}
   \end{proof}
-
-  \subsection{Slow Convergence}
-
-  \begin{table}
-    \begin{tabular}{l | c | c | c | c | c | c}
-      Trials & 10 & 20 & 50 & 100 & 200 & 500 \\
-      \hline \hline
-      1000 & 0.111 & 0.122 & 0.179 & 0.249 & 0.363 & 0.537 \\
-      5000 & 0.093 & 0.062 & 0.075 & 0.104 & 0.162 & 0.241 \\
-     10000 & 0.089 & 0.059 & 0.055 & 0.071 & 0.106 & 0.176 \\
-     50000 & 0.090 & 0.047 & 0.028 & 0.037 & 0.052 & 0.077 \\
-    100000 & 0.090 & 0.047 & 0.021 & 0.026 & 0.033 & 0.059 \\
-    200000 & 0.091 & 0.047 & 0.021 & 0.018 & 0.022 & 0.040 \\
-    500000 & 0.091 & 0.047 & 0.019 & 0.013 & 0.017 & 0.025 \\
-   1000000 & 0.090 & 0.047 & 0.019 & 0.011 & 0.011 & 0.017 \\
-    \end{tabular}
-    \caption{Average Differences of Expected and Realized Rank}
-  \end{table}
 
 \end{document}
