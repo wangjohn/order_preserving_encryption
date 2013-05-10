@@ -104,7 +104,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
 \section{Random Tiebreaking Order Preserving Encryption (RTOPE)}
 
-  Consider a simple tie-breaking rule on top of Popa et al (2013)'s mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability. Note that in this scheme, we will use a randomized encryption scheme so that the server cannot tell if two plaintext values are the same.
+  Consider a simple tie-breaking rule on top of Popa et al (2013)'s mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability. Note that in this scheme, we will use a randomized encryption scheme which is IND-CCA so that the server cannot tell if two plaintext values are the same.
 
   To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process.
 
@@ -122,8 +122,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
     When there are no repeated elements, we can use the same argument we used in the DCS proof. We note that the sequence $\{V_1, V_2, \ldots, V_{\kappa} \}$ has a bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) shows that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. Thus, the base case of no repetitions is secure.
 
-    Now, suppose that RTOPE is IND-CPDA secure when there are at most $k$ reptitions across $V_i$ and $W_i$. Select one of the repetitions
-
+    Now, suppose that RTOPE is IND-CPDA secure when there are at most $k$ repetitions across $V_i$ and $W_i$. Now consider a sequence where there are $k+1$ repetitions across $V_i$ and $W_i$ for all $i$. Select two ciphertexts $c_1$ and $c_2$ of some repeated value $x$ and let us consider how it this pair of repetitions is inserted into the tree. Since RTOPE uses an encryption scheme which is IND-CCA for its ciphertexts, the adversary will not be able to tell whether $Dec(SK, c_1) = Dec(SK, c_2)$ with more than $1/2$ probability (by the definition of IND-CCA security). This means that the adversary cannot distinguish $c_1$ and $c_2$ as being repetitions with any advantage. Thus, a sequence of $k+1$ repetitions is information theoretically the same for the adversary as a sequence of $k$ repetitions, which we already know is IND-CPDA secure. Using induction, we have completed the proof.  
   \end{proof}
 
 \section{Relationship Between DCS and RTOPE}
