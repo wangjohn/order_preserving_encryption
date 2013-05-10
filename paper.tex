@@ -112,7 +112,19 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   \subsection{Security of RTOPE}
 
-  RTOPE can be proven to be IND-CPDA, just like the DCS scheme. In fact, one can show the equivalence of RTOPE and DCS in terms of the OPE encodings that both provide.
+  RTOPE can be proven to be IND-CPDA, just like the DCS scheme.
+
+  \begin{theorem}
+    RTOPE is IND-CPDA secure.
+  \end{theorem}
+  \begin{proof}
+    Like in the security proof for DCS, we shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sequences of size $\lambda$. Again, we shall use induction on the number of repeated elements in either $V_i$ or $W_i$. 
+
+    When there are no repeated elements, we can use the same argument we used in the DCS proof. We note that the sequence $\{V_1, V_2, \ldots, V_{\kappa} \}$ has a bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) shows that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. Thus, the base case of no repetitions is secure.
+
+    Now, suppose that RTOPE is IND-CPDA secure when there are at most $k$ reptitions across $V_i$ and $W_i$. Select one of the repetitions
+
+  \end{proof}
 
 \section{Relationship Between DCS and RTOPE}
 
