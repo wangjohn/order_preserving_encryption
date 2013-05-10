@@ -127,7 +127,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
 \section{Relationship Between DCS and RTOPE}
 
-  In order to show that RTOPE and DCS are equivalent, we first need a notion of equivalence for an OPE scheme. Since both RTOPE and DCS are randomized, we cannot take the naive approach and say that two schemes are equivalent if they provide the same OPE encodings. Instead, we will use a notion of the equivalence of the distributions of the encodings. We will now formally define equivalence.
+  In this section, we shall propose a notion of equivalence between two OPE schemes.
 
   \subsection{Structural Expectation Equivalence}
 
@@ -150,7 +150,7 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
 
   \subsection{Structural Expectation Equivalence of DCS and RTOPE}
 
-We will now show that under certain conditions, DCS and RTOPE are equivalent. Namely, we shall show that as the number of repetitions tends to infinity, there exists an exact equivalence between DCS and RTOPE. In order to show this, we shall begin by noting some properties of both DCS and RTOPE. We shall examine the binary search tree that is stored on the server for both the DCS and RTOPE schemes. 
+  In this section, we shall investigate whether DCS and RTOPE are structurally expectation equivalent. To do this, we shall first examine some propositions.
 
 \begin{proposition}
   There exists some subtree which contains all the ciphertexts corresponding to a plaintext $x$ in both DCS and RTOPE.
@@ -236,5 +236,10 @@ For DCS, one can see that moving left or right from the root element depends on 
       \caption{Probability of $r^*$ falling between the $j$th and $j+1$st largest values in the sequence $\{r_i\}_{i=1}^n$}
     \end{figure}
   \end{proof}
+
+  \subsection{Convergence in Number of Re-encodings}
+
+  Although DCS and RTOPE are not structurally expectation equivalent, we can examien other properties between these two schemes. In particular, we can show that as $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$ where $R_{i}$ is the number of repetitions for scheme $i$, then the number of re-encodings in DCS and RTOPE will converge to the same number.
+  
 
 \end{document}
