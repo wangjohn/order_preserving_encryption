@@ -53,7 +53,7 @@ Querying, however, gets more difficult, and the next section will discuss how th
 
   To query for some value $y$, we must actually perform a range query, since any value $y$ will be encrypted with a plaintext $y + r$ where $r \in [0,1)$. This means, the encrypted plaintext of $y$ can therefore take in the range $[y, y + 1)$. Thus, to query for the value $y$, we must perform a range query on any values in the range $[y, y+1)$.
 
-  Performing this range query on the binary search tree can be done by searching for $y$ and $y+1$ individually. Once we have found $y$ and $y+1$, then we can be find the least common ancestor between the nodes of $y$ and $y+1$. The subtree rooted at the least common ancestor will contain all possible values in the range $[y, y+1)$. 
+  Performing this range query on the binary search tree can be done by searching for $y$ and $y+1$ individually. Once we have found $y$ and $y+1$, then we can move up the tree until we find the least common ancestor between the nodes of $y$ and $y+1$. The subtree rooted at the least common ancestor will contain all possible values in the range $[y, y+1)$.
 
   \begin{lemma}
     The subtree rooted at the least common ancestor of $y$ and $y+1$ in a binary search tree contains all values $x \in [y, y+1)$.
@@ -65,10 +65,10 @@ Querying, however, gets more difficult, and the next section will discuss how th
 
     This is a contradiction, however, because we assumed $x \in [y, y+1)$, which shows that the subtree contains all values $x \in [y, y+1)$.
   \end{proof}
-  
-  We can be assured that there are no repeats in the encrypted plaintexts.
 
+This lemma instructs us on how to find all values $x \in [y, y+1)$. As we move up the binary search tree to parents of $y$, we check the right subtree of the parent looking for all values in $[y, y+1)$. We do this as we continue upwards for all successive parent nodes. For the node at $y+1$, we check the left subtree of all parents for values in $[y, y+1)$. We continue this process until the parent of the $y$ node meets the parent of the $y+1$ node. This process will find all values in $[y, y+1)$, because as we have shown, all values in the interval are inside the subtree.
 
+  This process is correct because we continue checking subtrees until we find the least common ancestor for the parents of both the $y$ and the $y+1$ nodes. The runtime of this is just $\log(n) + K$ where $K$ is the number of values in the range $[y, y+1)$.
 
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
 
