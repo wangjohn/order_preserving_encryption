@@ -143,10 +143,14 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
     Let $T$ be a binary search tree and $x$ be a repeated value in the binary search tree. There exists a subtree $T'$ rooted at $x$ which contains all values $x$ in the tree $T$.
   \end{proposition}
   \begin{proof}
+    We shall construct the tree by taking all possible values of $x$, and finding the lowest common ancestor of each of these values. It is always possible to find the lowest common ancestor of each of these values, and these will create a subtree. All that is left is to show that the subtree is rooted at $x$, or in other words, that the least common ancestor of all the values of $x$ in the tree is also $x$.
 
+    We note that there are three cases. First, if $x$ is not repeated (i.e. occurs in the tree only once), then the proposition is trivially true. Second, if $x$ is repeated, and all the repeated values are in the right subtree of the least common ancestor, then one can choose the value of $x$ which has the largest height in the binary search tree. This defines a subtree containing all values of $x$ and which is also rooted at $x$. The same idea follows when all the repeated values of $x$ are in the left subtree. Finally, if the repeated values of $x$ are in both the left and right subtree of the least common ancestor $l$, then we know that $x \leq l$ and $x \geq l$ by the properties of a binary search tree. This implies that $l = x$, whichcompletes the proof.
   \end{proof}
 
   By the above proposition, we can show that as soon as we find the first value of $x$ based on the regular binary search tree query algorithm, then all other values of $x$ will be contained in either the left or right subtree of this node. This implies that we will find all values of $x$ in the tree.
+
+  The runtime of this query is
 
   \subsection{Security of RTOPE}
 
