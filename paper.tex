@@ -51,6 +51,23 @@ Querying, however, gets more difficult, and the next section will discuss how th
 
 \subsection{Querying Under DCS}
 
+  To query for some value $y$, we must actually perform a range query, since any value $y$ will be encrypted with a plaintext $y + r$ where $r \in [0,1)$. This means, the encrypted plaintext of $y$ can therefore take in the range $[y, y + 1)$. Thus, to query for the value $y$, we must perform a range query on any values in the range $[y, y+1)$.
+
+  Performing this range query on the binary search tree can be done by searching for $y$ and $y+1$ individually. Once we have found $y$ and $y+1$, then we can be find the least common ancestor between the nodes of $y$ and $y+1$. The subtree rooted at the least common ancestor will contain all possible values in the range $[y, y+1)$. 
+
+  \begin{lemma}
+    The subtree rooted at the least common ancestor of $y$ and $y+1$ in a binary search tree contains all values $x \in [y, y+1)$.
+  \end{lemma}
+  \begin{proof}
+    Let us examine some value $x \in [y, y+1)$, and call the $l$ the least common ancestor of $y$ and $y+1$.
+
+    Now suppose $x$ is not in the subtree rooted at $l$. This means that $x$ must either be smaller than the left-most node in the subtree rooted at $l$ or greater than the right-most node in the subtree (assuming that no nodes are have repeated values which occurs with high probability because of the random bits $r$ appended to each plaintext). However, we know that the left-most node in the subtree rooted at $l$ must be smaller than $y$ and the right-most node in the subtree must be greater than $y+1$. This is true because both $y$ and $y+1$ are nodes in the subtree.
+
+    This is a contradiction, however, because we assumed $x \in [y, y+1)$, which shows that the subtree contains all values $x \in [y, y+1)$.
+  \end{proof}
+  
+  We can be assured that there are no repeats in the encrypted plaintexts.
+
 
 
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
@@ -240,6 +257,13 @@ For DCS, one can see that moving left or right from the root element depends on 
   \subsection{Convergence in Number of Re-encodings}
 
   Although DCS and RTOPE are not structurally expectation equivalent, we can examien other properties between these two schemes. In particular, we can show that as $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$ where $R_{i}$ is the number of repetitions for scheme $i$, then the number of re-encodings in DCS and RTOPE will converge to the same number.
+
+  \begin{theorem}
+    As $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$, then the number of re-econdings in DCS and RTOPE will converge to the same number.
+  \end{theorem}
+  \begin{proof}
+  \end{proof}
+
   
 
 \end{document}
