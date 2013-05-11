@@ -70,6 +70,10 @@ This lemma instructs us on how to find all values $x \in [y, y+1)$. As we move u
 
   This process is correct because we continue checking subtrees until we find the least common ancestor for the parents of both the $y$ and the $y+1$ nodes. The runtime of this is just $\log(n) + K$ where $K$ is the number of values in the range $[y, y+1)$.
 
+  \subsection{Range Queries Under DCS}
+
+  To perform range queries under the DCS scheme, one simply needs to perform a range query on the underlying binary search tree. If one attempts to query for values $x \in [y, z]$, then we simply perform a range query for the underlying plaintexts in the binary search tree in the range $[y, z+1)$. We use the same range query mechanism as in the previous section, making sure to only output values that are inside in the interval $[y, z+1)$.
+
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
 
 This security definition consists of two phases of interaction between the adversary and the challenger.
@@ -126,6 +130,23 @@ We have therefore shown by induction that DCS is IND-CPDA secure for any number 
   To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process.
 
   This scheme is a simple extension of Popa et al (2013)'s scheme and handles repeated values. In RTOPE, the server cannot tell how many values are repeated, and what the distribution of repeated values looks like.
+
+  \subsection{Querying Under RTOPE}
+
+  Under RTOPE, there are multiple variations on querying for some value $x$. First is to query for just one ciphertext whose corresponding plaintext is equal to $x$. The second query type is to query for all ciphertexts whose corresponding plaintext is equal to $x$. 
+
+  The first case is easy to handle and can be achieved by using the regular query mechanism used by Popa et al (2013) and returning the first ciphertext found which matches. If there are any ciphertexts which can be decrypted to $x$, then the regular binary search tree mechanism will find at least one, which guarantees that this will correctly return one of these ciphertexts.
+
+  The second case can be handled by a modified query algorithm. To return all ciphertexts decrypting to $x$, we still need to do a regular query for $x$. Upon finding the first $x$, we append this value to our list of results, and we need to query both the right and left subtrees for $x$ again. Doing this recursively until we reach a leaf will guarantee that we will find all possible places where $x$. This gaurantee can be given in the following proposition:
+
+  \begin{proposition}
+    Let $T$ be a binary search tree and $x$ be a repeated value in the binary search tree. There exists a subtree $T'$ rooted at $x$ which contains all values $x$ in the tree $T$.
+  \end{proposition}
+  \begin{proof}
+
+  \end{proof}
+
+  By the above proposition, we can show that as soon as we find the first value of $x$ based on the regular binary search tree query algorithm, then all other values of $x$ will be contained in either the left or right subtree of this node. This implies that we will find all values of $x$ in the tree.
 
   \subsection{Security of RTOPE}
 
