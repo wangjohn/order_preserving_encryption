@@ -45,6 +45,12 @@ The rest of the paper is organized as follows. II discusses related work. III pr
 
 \section{Related Work}
 
+Research surrounding OPE schemes has made significant progress in recent years. The most recent contribution of the mOPE scheme by Raluca et al (2013) achieves ideal IND-OCPA security, and thus, our schemes are built upon mOPE.
+
+DCS and RTOPE provide the new security guarantee of IND-CPDA, which is related to performing range queries over encrypted data. Range query schemes provide an algorithm to learn the order between a query value and data value, ideally leaking no other information. Our schemes are easily modified to support range queries while still guaranteeing the security of the distribution of the underlying plaintext.
+
+Raluca et al (2013) provides a new security definition, same-time OPE security, which dictates that an adversary can learn the order only for values stored in the application at the same time. This definition is stronger than IND-OCPA. Our security guarantee of IND-CPDA provides that the order only, not the distribution, for ciphertexts is leaked to an adversary.
+
 \section{Distribution Confidentiality Scheme}
 
 In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Raluca et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance.
