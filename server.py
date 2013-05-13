@@ -223,7 +223,7 @@ len(rebalance.subtree_sizes) is the number of rebalances.
 '''
 @counter
 def rebalance(node):
-    print "Rebalance count: " + str(rebalance.subtree_sizes)
+    #print "Rebalance count: " + str(rebalance.subtree_sizes)
     print "Rebalance time: " + str(sum(rebalance.subtree_sizes))
     if balance_factor(node) == -2:
         if balance_factor(node.right) == -1: # right-right case
