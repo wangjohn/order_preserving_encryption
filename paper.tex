@@ -51,6 +51,8 @@ DCS and RTOPE provide the new security guarantee of IND-CPDA, which is related t
 
 Raluca et al (2013) provides a new security definition, same-time OPE security, which dictates that an adversary can learn the order only for values stored in the application at the same time. This definition is stronger than IND-OCPA. Our security guarantee of IND-CPDA provides that the order only, not the distribution, for ciphertexts is leaked to an adversary.
 
+Prior work on range query schemes also leak information about the underlying plaintext. Shi et al (2007) designed an encryption scheme that leaks the decrypted data for values that fall within the range query, but preserves the privacy of all other values. We chose to build on schemes on existing OPE schemes, instead of range query schemes, to provide the security of the plaintext even within the range queries. 
+
 \section{Distribution Confidentiality Scheme}
 
 In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Raluca et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance.
