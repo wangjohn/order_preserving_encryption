@@ -24,9 +24,30 @@ Hrishikesh Joshi, Max Kolysh, Mari Miyachi, John Wang}
 
 \maketitle
 
+\section{Introduction}
+An order-preserving encryption scheme utalizes an encryption algorithm to produce ciphertexts that preserve the numerical ordering of the plaintexts. This allows an untrusted server to perform order comparison, for the purpose of sorting or range checks, among other applications. The ideal security goal for an order-preserving encryption scheme, IND-OCPA, is to reveal only information regarding the order of the plaintext values. The first ideal-security order-preserving encryption scheme was proposed by Raluca et al (2013) and called a mutable order-preserving encoding, or mOPE. 
+
+mOPE works be creating a balanced search tree containing all the encrypted data. Each encrypted value is a node associated with a binary encoding that represents its path on the tree, from root to node. The search tree and encrypted data is stored on an untrusted server, and a client is responsible for encrypting values and inserting them in the tree using an interactive protocol. This protocol also requires that the search tree be rebalanced and the binary encodings rewritten.
+
+mOPE does, however, leak information about the distribution of plaintext values. Each node of an mOPE search tree, representing an encrypted value, is also created with a counter. So if a client inserts more than one of the same plaintext value, this counter is incremented, as opposed to a new node in the search tree created. The result is that an adversary can identify the number of times a repeated plaintext value is inserted.
+
+This paper presents two schemes that provide the additional security of guaranteeing no leaked information regarding the distribution of elements. We define the security guarantee as Indistinguisability Under Chosen Plaintext Distribution Attack, IND-CPDA. 
+
+The first IND-CPDA scheme we present is the Distribution Confidentiality Scheme, DCS. DCS uses the mOPE scheme and adds random bits to the end of plaintext to randomize the ciphertext values. This prevents the server from identifying the number of times a repeated plaintext value is inserted.
+
+The second IND-CPDA scheme we present is the Random Tiebreaking Order Preservering Encryption, RTOPE. RTOPE operates again on top of mOPE, and when a repeated plaintext value is inserted, upon reaching that node in the search tree, the client tells the server to insert left or right with uniform probability. Again, the server cannot tell the number of times a plaintext value is repeated. 
+
+We present the concept of structural expectation equivalence, which is a mapping from all possible OPE encodings of one scheme to another, with the probability of obtaining each encoding in the first scheme is equal to the probability of obtaining the corresponding encoding in the second scheme. We compare DCS and RTOPE, to prove that the two schemes are structurally expectation equivalent. This equivalence relationship, we show, also proves that both schemes must be IND-CPDA secure. 
+
+To understand the performance and equivalence of our two schemes, we implemented both under an honest server model, and evaluated the number of node rewrites using a range of benchmarks.
+
+The rest of the paper is organized as follows. II discusses related work. III presents DCS in more detail and IV describes IND-CPDA. V presents RTOPE in more detail. VI compares the two schemes, DCS and RTOPE, and proves their equivalence. Finally VII concludes.
+
+\section{Related Work}
+
 \section{Distribution Confidentiality Scheme}
 
-In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Raluca et al (2013)'s original mOPE scheme, but adds an additional layer of security.
+In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Raluca et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance.
 
 In essence, the DCS scheme adds random bits to the end of a plaintext so that the ciphertext values are randomized. This will prevent the server from being able to identify the number of times a repeated plaintext value is inserted.
 
@@ -281,13 +302,17 @@ For DCS, one can see that moving left or right from the root element depends on 
 
   \subsection{Convergence in Number of Re-encodings}
 
-  Although DCS and RTOPE are not structurally expectation equivalent, we can examien other properties between these two schemes. In particular, we can show that as $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$ where $R_{i}$ is the number of repetitions for scheme $i$, then the number of re-encodings in DCS and RTOPE will converge to the same number.
+  Although DCS and RTOPE are not structurally expectation equivalent, we can examine other properties between these two schemes. In particular, we can show that as $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$ where $R_{i}$ is the number of repetitions for scheme $i$, then the number of re-encodings in DCS and RTOPE will converge to the same number.
 
   \begin{theorem}
     As $n \to \infty$, if $R_{DCS} / R_{RTOPE} = c$ for some constant $c$, then the number of re-econdings in DCS and RTOPE will converge to the same number.
   \end{theorem}
   \begin{proof}
   \end{proof}
+  
+  \section{Conclusion}
+  
+  We presented DCS and RTOPE, two order-preserving encryption schemes that achieve ideal IND-CPDA security, where an adversary learns nothing about the distribution of the plaintext values based on the ciphertexts, and only the order of the elements. We introduce the notion of structurally expectation equivalence, and show that DCS and RTOPE satisfy this equivalence relationship. Finally, we show that DCS and RTOPE achieve comprable performance.
 
   
 
