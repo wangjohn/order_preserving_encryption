@@ -1,2 +1,6 @@
 *.pyc
 *.DS_STORE
+*.aux
+*.log
+*.pdf
+*.gz

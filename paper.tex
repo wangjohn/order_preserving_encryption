@@ -6,6 +6,7 @@
 \usepackage[margin=0.75in]{geometry}
 \usepackage{rotating}
 \usepackage{amsthm}
+\usepackage{booktabs}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -25,7 +26,7 @@ Hrishikesh Joshi, Max Kolysh, Mari Miyachi, John Wang}
 \maketitle
 
 \section{Introduction}
-An order-preserving encryption scheme utalizes an encryption algorithm to produce ciphertexts that preserve the numerical ordering of the plaintexts. This allows an untrusted server to perform order comparison, for the purpose of sorting or range checks, among other applications. The ideal security goal for an order-preserving encryption scheme, IND-OCPA, is to reveal only information regarding the order of the plaintext values. The first ideal-security order-preserving encryption scheme was proposed by Raluca et al (2013) and called a mutable order-preserving encoding, or mOPE. 
+An order-preserving encryption scheme utilizes an encryption algorithm to produce ciphertexts that preserve the numerical ordering of the plaintexts. This allows an untrusted server to perform order comparison, for the purpose of sorting or range checks, among other applications. The ideal security goal for an order-preserving encryption scheme, IND-OCPA, is to reveal only information regarding the order of the plaintext values. The first ideal-security order-preserving encryption scheme was proposed by Raluca et al (2013) and called a mutable order-preserving encoding, or mOPE. 
 
 mOPE works be creating a balanced search tree containing all the encrypted data. Each encrypted value is a node associated with a binary encoding that represents its path on the tree, from root to node. The search tree and encrypted data is stored on an untrusted server, and a client is responsible for encrypting values and inserting them in the tree using an interactive protocol. This protocol also requires that the search tree be rebalanced and the binary encodings rewritten.
 
@@ -294,7 +295,7 @@ For DCS, one can see that moving left or right from the root element depends on 
       \int_{0}^1 \int_0^{u_2} \left( \frac{n!}{j!(n-j-1)!} u_2^j (1 - u_2)^{n-j-1} \right) \left( \frac{n!}{(j-1)!(n-j)!} u_1^{j-1} (1 - u_1)^{n-j} \right) (u_2 - u_1) d_{u_1} d_{u_2}
     \end{eqnarray}
 
-    Letting $C(j) = \frac{n!}{j!(n-j-1)!} \frac{n!}{(j-1)!(n-j)!}$, and integrating the epression for $u_1$, we can obtain the following result:
+    Letting $C(j) = \frac{n!}{j!(n-j-1)!} \frac{n!}{(j-1)!(n-j)!}$, and integrating the expression for $u_1$, we can obtain the following result:
     \begin{eqnarray}
       C(j) \int_0^1 u_2^j (1 - u_2)^{n-j-1} \left( \frac{(u_2 (n+1) - j) B(j, n-j+1) + u_2^j (1-u_2)^{n-j+1}}{n+1} \right) d u_2
     \end{eqnarray}
@@ -318,10 +319,59 @@ For DCS, one can see that moving left or right from the root element depends on 
   \begin{proof}
   \end{proof}
   
+  \section{Experimental Results}
+  
+  To confirm our theoretical analysis, we implemented both the DCS and RTOPE encryption schemes on top of a simplified version of CryptDB. First, we created a framework that mimicked the necessary features of CryptDB, including the client-server interaction and full insertion and query functionality. We then made a testing framework which allowed us to easily change the number of inputs, the number of repeats in the inputs, and the choice of whether to use DCS or RTOPE. The results are summarizes in the table below.
+  
+  \begin{table} % Add the following just after the closing bracket on this line to specify a position for the table on the page: [h], [t], [b] or [p] - these mean: here, top, bottom and on a separate page, respectively
+\centering % Centers the table on the page, comment out to left-justify
+\begin{tabular}{l c c c c} % The final bracket specifies the number of columns in the table along with left and right borders which are specified using vertical bars (|); each column can be left, right or center-justified using l, r or c. To specify a precise width, use p{width}, e.g. p{5cm}
+\toprule % Top horizontal line
+& \multicolumn{5}{c}{Number of OPE Re-Encodings} \\ % Amalgamating several columns into one cell is done using the \multicolumn command as seen on this line
+\cmidrule(l){2-6} % Horizontal line spanning less than the full width of the table - you can add (r) or (l) just before the opening curly bracket to shorten the rule on the left or right side
+Type & Inputs & Repeats & Average & Std. Dev.\\ % Column names row
+\midrule % In-table horizontal line
+RTOPE & 100 & 0  & 7363 & 5003 \\
+      & 100 & 10  & 4385 & 2051 \\
+      & 100 & 20  & 3945 & 643\\
+      & 100 & 40  & 2598 & 642\\
+      \midrule
+DCS   & 100 & 0  & 3776 & 791 \\
+      & 100 & 10  & 4452 & 1059 \\
+      & 100 & 20  & 3287 & 1191\\
+      & 100 & 40  & 3754 & 582\\
+      \midrule
+RTOPE & 200 & 0  & 15078 & 6751 \\
+      & 200 & 20  & 16586 & 13215\\
+      & 200 & 40  & 15707 & 6924\\
+      \midrule
+DCS   & 200 & 0  & 11300 & 2512 \\
+      & 200 & 20  & 12355 & 8704\\
+      & 200 & 40  & 8274 & 1654\\
+\bottomrule % Bottom horizontal line
+\end{tabular}
+\caption{Experimental results. N=10 for each set of inputs.} % Table caption, can be commented out if no caption is required
+\label{tab:results_table} % A label for referencing this table elsewhere, references are used in text as \ref{label}
+\end{table}
+
+Each iteration constructed an entire tree from random inputs fitting the input criteria. The averages and standard deviations describe the distribution of the number of OPE re-encodings required throughout the construction of the tree. We make several observations from the data above: 
+
+\begin{enumerate}
+
+\item For large inputs, the average number of OPE re-encodings is roughly the same for both schemes. We found that even though the two schemes are not identical, they do have the same expectation for the shape of the resulting trees over a large number of iterations, so the averages will be the same.
+
+\item The standard deviation in OPE re-encodings varies significantly between the two schemes. This has to do with the resulting shape of the trees formed for the same inputs -- DCS is more likely to create an unbalanced tree, and thus the standard deviations tend to be higher than comparable RTOPE deviations.
+
+\item
+The average number of OPE re-encodings is roughly the same for any number of repeated items. DCS, each duplicate is converted into a unique number before the insertion phase. In RTOPE, each value is treated as if it were either larger or smaller than its duplicate during the insertion phase. In both cases, the server is not made aware of duplicate values, and thus their quantity has no bearing on the properties of the tree created by the server.
+
+\end{enumerate}
+  
   \section{Conclusion}
   
-  We presented DCS and RTOPE, two order-preserving encryption schemes that achieve ideal IND-CPDA security, where an adversary learns nothing about the distribution of the plaintext values based on the ciphertexts, and only the order of the elements. We introduce the notion of structurally expectation equivalence, and show that DCS and RTOPE satisfy this equivalence relationship. Finally, we show that DCS and RTOPE achieve comprable performance.
-
+  We presented DCS and RTOPE, two order-preserving encryption schemes that achieve ideal IND-CPDA security, where an adversary learns nothing about the distribution of the plaintext values based on the ciphertexts, and only the order of the elements. We introduce the notion of structurally expectation equivalence, and show that DCS and RTOPE satisfy this equivalence relationship. Finally, we show that DCS and RTOPE achieve comprable performance. 
+  
+  
   
 
 \end{document}
