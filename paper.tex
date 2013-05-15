@@ -8,10 +8,11 @@
 \usepackage{amsthm}
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{listings}
+\usepackage[parfill]{parskip}
 
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
@@ -30,31 +31,44 @@
 
 \section{Introduction}
 
-Order-preserving encryption schemes serve to generate ciphertexts that preserve the numerical ordering of the plaintexts. Such schemes provide an entity for storing encrypted data, such as a mail server or a server interacting with a database, and the ability to perform order comparison operations such as sorting, range query checks, and ranking, among other applications. The ideal security goal for an order-preserving encryption scheme, IND-OCPA, is for the scheme to reveal nothing except for the order of the plaintexts. \\ \\
-For more than a decade, researchers have developed such schemes with varying degrees success. Often, thees schemes compromised security to preserve order, leaking plaintexts or other attributes of the data. Recently, the first order-preserving encryption scheme that satisfies IND-OCPA, mutable order-preserving encoding (mOPE), was proposed by Popa et al (2013). mOPE works by creating a balanced search tree containing all the encrypted data on a server, giving the server the ability to order the tree based on the plaintexts without learning any information regarding the plaintexts themselves. All encrypted values are represented by a node in the balanced search tree. Each node has an Order Preserving Encoding (OPE) which represents its path on the tree from the root to itself, allowing the server the ability to maintain the order of the plaintexts. \\ \\ 
-One disadvantage of mOPE, however, is that multiple entries of the same plaintext value are maintainted in the same node in the tree with a counter. This means that the scheme can leak information about the distribution of plaintext values. In this paper, we present two schemes that address this issue: Distribution Confidentiality Scheme (DCS) and Random Tiebreaking Order Preservering Encryption (RTOPE). Further, we define a new security guarantee, Indistinguisability Under Chosen Plaintext Distribution Attack (IND-CPDA), which these schemes are intended to satisfy. \\ \\
-To better understand the performance and equivalence of our two schemes, we implemented both with a client-server framework that supports insertion and query functionality. We evaluated the number of OPE re-encodings that resulted over a range of benchmark inputs. These inputs also had varying amounts of repetition, to better evaluate our schemes under uneven plaintext distributions. We show the results of this work, and prove that the two schemes are not structurally expectation equivalent. \\ \\
-The rest of the paper is organized as follows. II discusses mOPE, including related work. III presents DCS in more detail and IV describes IND-CPDA. V presents RTOPE in more detail. VI compares the two schemes, DCS and RTOPE, and proves their equivalence. VII describes the experimental results of our implementation of the two schemes. Finally VIII concludes with a brief overview of our overall approach. 
+Order-preserving encryption schemes serve to generate ciphertexts that preserve the numerical ordering of the plaintexts. Such schemes provide an entity for storing encrypted data, such as a mail server or a server interacting with a database, and the ability to perform order comparison operations such as sorting, range query checks, and ranking, among other applications. The ideal security goal for an order-preserving encryption scheme, IND-OCPA, is for the scheme to reveal nothing except for the order of the plaintexts.
+
+For more than a decade, researchers have developed such schemes with varying degrees of success. Often, these schemes compromised security to preserve order, leaking plaintexts or other attributes of the data. Recently, the first order-preserving encryption scheme that satisfies IND-OCPA, mutable order-preserving encoding (mOPE), was proposed by Popa et al (2013). mOPE works by creating a balanced search tree containing all the encrypted data on a server, giving the server the ability to order the tree based on the plaintexts without learning any information regarding the plaintexts themselves. All encrypted values are represented by a node in the balanced search tree. Each node has an Order Preserving Encoding (OPE) which represents its path on the tree from the root to itself, allowing the server the ability to maintain the order of the plaintexts.
+
+One disadvantage of mOPE, however, is that multiple entries of the same plaintext value are maintainted in the same node in the tree with a counter. This means that the scheme can leak information about the distribution of plaintext values. In this paper, we present two schemes that address this issue: Distribution Confidentiality Scheme (DCS) and Random Tiebreaking Order Preservering Encryption (RTOPE). Further, we define a new security guarantee, Indistinguisability Under Chosen Plaintext Distribution Attack (IND-CPDA), which these schemes are intended to satisfy.
+
+To better understand the performance and equivalence of our two schemes, we implemented both with a client-server framework that supports insertion and query functionality. We evaluated the number of OPE re-encodings that resulted over a range of benchmark inputs. These inputs also had varying amounts of repetition, to better evaluate our schemes under uneven plaintext distributions. We show the results of this work, and prove that the two schemes are not structurally expectation equivalent.
+
+The rest of the paper is organized as follows: II discusses mOPE, including related work, III presents DCS, IV describes IND-CPDA, V presents RTOPE, VI compares the two schemes, DCS and RTOPE, VII describes the experimental results of our implementation of the two schemes, and finally VIII concludes with a brief overview of our overall approach. 
+
 \section{Mutable Order-Preserving Scheme (mOPE)}
-As mentioned earlier, mOPE is the first known order-preserving scheme that satisfies IND-OCPA, leaking nothing with the exception of the order of the plaintexts. In this section we describe how mOPE works, including the leakage of distribution that it can lead to. We begin with two entities, 
-an untrusted server and a client with confidential data as shown in Figure 1. 
+
+As mentioned earlier, mOPE is the first known order-preserving scheme that satisfies IND-OCPA, leaking nothing with the exception of the order of the plaintexts. In this section we describe how mOPE works, including the leakage of distribution that it can lead to. We begin with two entities, an untrusted server and a client with confidential data as shown in Figure 1.
+
 \begin{figure}[htb]
 \begin{center}
 \includegraphics[height=1.2in,width=4in,angle=0]{857pic4.png}
 \caption{The client hosts confidential data in encrypted form on the untrusted server. mOPE allows subsequent operations requiring order to be performed on the encrypted data on the untrusted server.}
 \end{center}
 \end{figure}
+
 \subsection{Storage of Data on Client and Server}
+
 Figure 2 below depicts the data maintained by the client and server at a given point in time. The client hosts confidential plaintext data and and the corresponding ciphertexts. The client relays the ciphertexts to the server, which maintains a table with the corresponding ciphertexts. The B-tree maintained by the server shows the data marked by the ciphertext values, which the server knows, but ordered by the underlying plaintexts, which the server does not know. The ability for the server to maintain such order based on plaintexts without knowing the underlying plaintexts is explained in the next section. It is important to note that the server generates Order-Preserving Encodings (OPEs) for each of the ciphertexts in the B-tree, and preserves a mapping between OPEs and ciphertexts as shown in the table the server maintains.
+
 \begin{figure}[htb]
 \begin{center}
 \includegraphics[height=4.2in,width=6in,angle=0]{857pic6.png}
 \caption{The client hosts a series of plaintexts and their corresponding ciphertexts. The client provides the server with the ciphertexts, and the server maintains a B-tree ordered by plaintext values, along with a mapping between OPEs and ciphertexts.}
 \end{center}
 \end{figure}
+
 \subsection{Protocol for Maintaining Order on Server}
-As stated previously, the server orders the values in the B-tree based on plaintexts without knowing the plaintexts themselves. The server's ability to do so is best illustrated by considering how new values are added to the server's table by the client. In Figure 3 below, we consider the situation in which the client adds a new plaintext with value 30 and corresponding ciphertext with value 10 to the existing data from Figure 2. \\ \\
+
+As stated previously, the server orders the values in the B-tree based on plaintexts without knowing the plaintexts themselves. The server's ability to do so is best illustrated by considering how new values are added to the server's table by the client. In Figure 3 below, we consider the situation in which the client adds a new plaintext with value 30 and corresponding ciphertext with value 10 to the existing data from Figure 2.
+
 To insert the value, the client first notifies the server, which subsequently gives back the client the ciphertext of the root node, which is 32. The client decrypts the ciphertext to find the corresponding plaintext, which has value 24, and subsequently determines whether the new plaintext he wishes to insert should lie to the right or left of the node returned by the server in order to preserve plaintext-based order in the B-tree. The client relays the proper direction to the server, which in this instance is the right side, and the server thereby moves right down the tree and gives the client the ciphertext of the right child of the root node. This interactive protocol continues until the server is unable to give the client a child node at the end of a tree path, and the client subsequently tells the server to add the new node to the appropriate postiion as a child of the existing leaf node. In this instance, the node with ciphertext 30 is inserted to the left of the node with ciphertext 16 since the ciphertext 30 has a plaintext with value 10, which is less than the plaintext with value 36 corresponding to the node with ciphertext of value 16. 
+
 \begin{figure}[htb]
 \begin{center}
 \includegraphics[height=4.5in,width=6in,angle=0]{857pic5.png}
@@ -68,33 +82,129 @@ When the client inserts multiple instances of the same value into the B-tree, th
 
 \subsection{Related Work}
 
-The mOPE scheme by Popa et al (2013) is the first scheme to achieve ideal IND-OCPA security, and our schemes are built upon mOPE. Prior work on range query schemes all leak information about the underlying plaintext. Shi et al (2007) designed an encryption scheme that leaks the decrypted data for values that fall within the range query, but preserves the privacy of all other values. We chose to build on schemes on existing OPE schemes, instead of range query schemes, to guarantee that security of underlying plaintext even within the range queries. \\ \\
+The mOPE scheme by Popa et al (2013) is the first scheme to achieve ideal IND-OCPA security, and our schemes are built upon mOPE. Prior work on range query schemes all leak information about the underlying plaintext. Shi et al (2007) designed an encryption scheme that leaks the decrypted data for values that fall within the range query, but preserves the privacy of all other values. We chose to build on schemes on existing OPE schemes, instead of range query schemes, to guarantee that security of underlying plaintext even within the range queries.
+
 Further, Popa et al (2013) provides a new security definition, same-time OPE security, which dictates that an adversary can learn the order only for values stored in the application at the same time, and is stronger than IND-OCPA. Our security guarantee of IND-CPDA, explained later in the paper, asks furthermore that the ciphertexts not leak the distribution of values. 
 
 \section{Distribution Confidentiality Scheme}
 
-In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Popa et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance. \\ \\
-In essence, the DCS scheme adds random bits to the end of a plaintext so that the ciphertext values are randomized. This will prevent the server from being able to identify the number of times a repeated plaintext value is inserted. \\ \\
+In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Popa et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance.
+
+In essence, the DCS scheme adds random bits to the end of a plaintext so that the ciphertext values are randomized. This will prevent the server from being able to identify the number of times a repeated plaintext value is inserted.
 
 \subsection{Description of DCS}
 
-This section will give a formal description of DCS. We will first describe the basic version of the scheme, then we will augment it so that decimal numbers can be represented as well. \\ \\
-In the basic version of the scheme, let us assume that we want to encrypt some plaintext value $x \in \mathrm{Z}$ and send it to the server like in the mOPE scheme. For DCS, there is an additional parameter $\rho$ which will govern the probability with which the server sees a repeated value. We will generate a random value $r \in [0,1)$ which contains $\rho$ bits, denoted $r_{\rho}$, and append it to the end of $x$. The resulting value $x' = x + r_{\rho}$ will be encrypted with DET. The mOPE scheme will work the same as before, but now acting on $x'$. \\ \\
-Inserting in this scheme is simple, since nothing else has to be changed from the mOPE scheme. The client will take the value $x$ to insert, create $x'$, then encrypt $x'$ to obtain a ciphertext. Inserting this ciphertext will involve moving down the server's binary search tree. The insertion process is started by the client acquiring the root node. The client then checks to see if $x'$ is larger or smaller than the root's decrypted value. This informs the client as to the direction in which it should move. Once it arrives at a leaf node, the client will insert the new ciphertext in the correct direction.
-\begin{figure}
-%\lstset{language=Python}
-%\begin{lstlisting}
-%  TODO: Insert the insertion pseudocode here.
-%\end{lstlisting}
-%\caption{Pseudocode for the Insertion Algorithm}
-%\label{insertion_figure}
+This section will give a formal description of DCS. We will first describe the basic version of the scheme, then we will augment it so that decimal numbers can be represented as well.
+
+In the basic version of the scheme, let us assume that we want to encrypt some plaintext value $x \in \mathrm{Z}$ and send it to the server like in the mOPE scheme. For DCS, there is an additional parameter $\rho$ which will govern the probability with which the server sees a repeated value. We will generate a random value $r \in [0,1)$ which contains $\rho$ bits, denoted $r_{\rho}$, and append it to the end of $x$. The resulting value $x' = x + r_{\rho}$ will be encrypted with DET (a deterministic encryption algorithm, whose secret key $SK$ is held by the client but not the server). The mOPE scheme will work the same as before, but now acting on $x'$.
+
+\subsection{Arbitrarily Small Collision Probability}
+
+In this scheme, the probability of any ciphertexts being the same is small, and can be made arbitrarily close to zero by picking a larger $\rho$ parameter. In particular, the probability of any ciphertexts being the same is equivalent to the probability of any of the chosen random numbers $r$ being the same for two different encodings of some plaintext $x$.
+
+Notice that this is exactly the birthday paradox problem since we must solve for the probability that any collision occurs. There are $2^\rho$ possible random numbers to be chosen. Now suppose that some value $x$ has $R(x)$ repetitions at the server, each with a plaintext value of $x'_i = x + r_i$ for the $i$th repetition. The probability of a collision and therefore a repeated ciphertext is just one minus the probability of no collisions:
+\begin{eqnarray}
+  Pr[\textrm{Ciphertext Collision of } Encode(SK, x)] = \prod_{i=1}^{R(x)} \left(1 - \frac{i}{2^{\rho}} \right)
+\end{eqnarray}
+
+The above expression is obtained because each newly chosen value $r_{i+1}$ can collide with $i$ previous values, out of the $2^{\rho}$ possible choices of $r_{i+1}$. Moreover, we can show that as $\rho \to \infty$, we obtain perfect collision protection. \\
+
+\begin{lemma}
+  If there exists some $N$ for which all $\rho > N$ have the property $R(x) \leq 2^{\rho}$ for all $x$ inserted into a DCS server tree, then as $\rho \to \infty$ the probability of collision approaches $0$.
+\end{lemma}
+\begin{proof}
+  The probability of collision approching 0 is equivalent to showing that the probability of no collisions approaches one. We have shown that the probability of no collisions is:
+  \begin{eqnarray}
+    \prod_{i=1}^{R(x)} \left(1 - \frac{i}{2^{\rho}} \right) &\leq& \prod_{i=1}^{R(x)} \left(1 - \frac{R(x)}{2^{\rho}} \right) \\
+                                                    &=& \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)}
+  \end{eqnarray}
+
+  Taking the limit as $\rho \to \infty$ and noting that $R(x) \leq 2^{\rho}$ for all $\rho > N$ so that $\lim_{\rho \to \infty} R(x) / 2^{\rho} = 0$, then we have:
+  \begin{eqnarray}
+    \lim_{\rho \to \infty} \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)} = 1
+  \end{eqnarray}
+
+  This shows that the collision probability approaches 0.
+\end{proof}
+
+Moreover, one can find an upper bound on the collision parameter $\rho$ one needs in order to not have collisions by using the upper bound of $(1 - R(x)/2^{\rho})^{R(x)}$ on the probability of no collisions. Setting this equal to one, we obtain:
+\begin{eqnarray}
+  \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)} &=& 1 \\
+                                            \rho &=& \log_2 R(x)
+\end{eqnarray}
+
+Thus, choosing the correct $\rho$ to use is as simple as taking $y = \max_x R(x)$ over all input plaintext values $x$, and setting $\rho = \log_2 y$. Unfortunately, it may not be possible to predict $y$ ahead of time before insertions, and in any case, it would be nice to have a dynamic way of changing $\rho$ to the specifications of the problem.
+
+\subsection{Dynamic Version of DCS}
+
+To do this, we change the procedure of DCS slightly so that $\rho$ varies with $R(x)$. Note that the change we shall posit in this subsection does not change the insertion or querying mechanisms (to be discussed in the next subsections) and is purely an optimization.
+
+The dynamic scheme will have a new collision parameter $\rho_x$ for each plaintext value $x$. We shall keep the invariant that $\rho_x \geq \log_2 R(x)$ at all times. We shall also keep a count of the number of times that $x$ has been repeated so far, $R(x)$, in an encrypted block of data on the server. Note that this encrypted block will be placed among numerous other data blocks that hold extra information. These data blocks are accessed directly by the client and will store data that cannot fit onto a single ciphertext from the mOPE encoding tree. The ciphertext blocks from the mOPE tree operate much like inodes in the UNIX filesystem, storing a pointer to the location of the relevant data blocks on the server. Each ciphertext in the mOPE tree which encrypts the plaintext $x' = x + r_i$ will store the location of the block containing $R(x)$.
+
+This allows the client to access $R(x)$ whenever he queries for $x$. Thus, when attempting to insert some value $x$ into the mOPE tree, the client must first query for $x$ (the process of this will be discussed later), and check the current value of $R(x)$, and increment it on the encrypted block stored on the server. Then, the client will select a value $\rho_x \geq \log_2 R(x)$ and use this to construct the random value $|r| = 2^{\rho_x}$ and the ciphertext $c = Encrypt(SK, x + r)$. Insertion will then proceed normally.
+
+Note that the ciphertext size for the mOPE tree must be fixed to some constant and that plaintext values will have to be padded. If there is no padding, then the adversary would be able to gain information on to the distribution of different repeated values with the same $\rho_x$ values. Note that arbitrarily long $\rho_x$ values can be used by simply using a linked list of encrypted data blocks on the server to store some ciphertext $c$ (although this would obviously negatively impact performance). All that is left to show is that collisions happen with low probability. \\
+
+\begin{proposition}
+  If one sets $\rho_x = c \lfloor \log_2 R(x) \rfloor$, then the probability of a collision is less than $2^c/R(x)^{c-1}$.
+\end{proposition}
+\begin{proof}
+  We will proceed by induction. When $R(x) = 0$, this is trivially true since the next item inserted will never collide. Now, suppose it holds true for $R(x) = k$. We shall show that the $k+1$st insertion will collide with probabability less than $1/R(x)^{c-1}$.
+
+  There are two cases when we insert $x$ the $k+1$st time. First, it could be that the collision parameter $\rho_x$ has increased, or in other words $\rho_x = c \lfloor \log_2 k + 1 \rfloor > c \lfloor \log_2 k \rfloor$. If this is the case, then the only way that a collision can happen with a previous value is if the first $c \lfloor \log_2 k \rfloor$ bits are the same as a previously held value, and the last $c \lfloor \log_2 k + 1 \rfloor - c \lfloor \log_2 k \rfloor$ bits are zeros. This would induce a collision in the scheme and happens with probability $R(x) / 2^{\rho_x}$ since there are $R(x)$ different ways that a previously held value to be followed by zeros can occur, out of the possible $2^{\rho_x}$ values.
+
+  The second case is when the collision parameter $\rho_x$ does not increase. In this case, we need to not collide with the $R(x)$ existing values. A collision will occur with probability $R(x) / 2^{\rho_x}$, since there are $2^{\rho_x}$ possible choices and $R(x)$ values to collide with.
+
+  Therefore, we see that the probability of collision in either case is:
+  \begin{eqnarray}
+    Pr[\textrm{Collision}] = \frac{R(x)}{2^{\rho_x}} &=& \frac{R(x)}{2^{c \lfloor \log_2 R(x) \rfloor}} \\
+                                                     &\leq& \frac{R(x)}{2^{c \log_2 R(x) - c}} \\
+                                                     &=& \frac{2^c}{R(x)^{c-1}}
+  \end{eqnarray}
+
+  This completes the proof.
+\end{proof}
+
+Therefore, choosing $c$ large enough will work for all values of $R(x)$, and will get better and better as $R(x)$ grows. To combat the fact that this probability is close to 1 when $R(x)$ is small, one can simply initialize $\rho_x$ to a larger value than the base case of 1, which makes the probability of collision early on very small. Continuing and adding more repetitions of a value $x$ only decreases the probability of collision. For instance, when $c = 5$, the probability of collision is around 5\% for 5 repeated inputs, but falls off dramatically to 0.3\% for 10 repeated inputs.
+
+Using a rule like the one used in the above proposition should give a good dynamic scheme for $\rho_x$ which provides low probability of collision.
+
+\subsection{Inserting in DCS}
+
+Inserting in this scheme is simple, since nothing else has to be changed from the mOPE scheme. The client will take the value $x$ to insert, create $x'$, then encrypt $x'$ to obtain a ciphertext. Inserting this ciphertext will involve moving down the server's binary search tree. The insertion process is started by the client acquiring the root node. The client then checks to see if $x'$ is larger or smaller than the root's decrypted value. This informs the client as to the direction in which it should move. Once it arrives at a leaf node, the client will insert the new ciphertext in the correct direction. Figure \ref{insertion_figure} provides pseudocode for how one might create an insertion algorithm at the client.
+
+\begin{figure}[htb]
+\lstset{language=Python}
+\begin{lstlisting}[frame=single]
+class Client:
+    def insert(x):
+        r = random()
+        xprime = x + r
+        c = encrypt(client.secret_key, xprime)
+        root_ciphertext = server.get_root()
+        tree_moves(xprime, c, root_ciphertext)
+
+    def tree_moves(value, encrypted_value, ciphertext):
+        plaintext = decrypt(server.secret_key, ciphertext)
+        if value < plaintext:
+            new_ciphertext = server.move_left()
+        elif value > plaintext:
+            new_ciphertext = server.move_right()
+        else:
+            return server.insert(encrypted_value)
+        tree_moves(value, encrypted_value, new_ciphertext)
+\end{lstlisting}
+\caption{Pseudocode for the Insertion Algorithm. The algorithm is a communication between the client and the server. The client asks for ciphertexts stored on the server, decrypts the ciphertexts, then determines whether to move left or right.}
+\label{insertion_figure}
 \end{figure}
-Querying, however, is more difficult, and the next section will discuss how the client can query for some value $y$. 
+
 
 \subsection{Querying Under DCS}
 
-  To query for some value $y$, we must actually perform a range query, since any value $y$ will be encrypted with a plaintext $y + r$ where $r \in [0,1)$. Therefore, the encrypted plaintext of $y$ can be in the range $[y, y + 1)$. Thus, to query for the value $y$, we must perform a range query on any values in the range $[y, y+1)$. \\ \\
-Performing this range query on the binary search tree can be done by searching for $y$ and $y+1$ individually. Once we have found $y$ and $y+1$, then we can move up the tree until we find the least common ancestor between the nodes of $y$ and $y+1$. The subtree rooted at the least common ancestor will contain all possible values in the range $[y, y+1)$.
+To query for some value $y$, we must actually perform a range query, since any value $y$ will be encrypted with a plaintext $y + r$ where $r \in [0,1)$. Therefore, the encrypted plaintext of $y$ can be in the range $[y, y + 1)$. Thus, to query for the value $y$, we must perform a range query on any values in the range $[y, y+1]$. The client will remove all values which are exactly equal to $y + 1$, but this should be arbitrarily small (in fact the probability will be $2^{-\rho}$ where $\rho$ is the collision parameter) so it should not affect performance in practice. Because of this, we shall abuse notation and say the process of querying the range $[y, y+1]$ and removing all values of $y+1$ will be equivalent to just querying the range $[y, y+1)$.
+
+Performing this range query on the binary search tree can be done by searching for $y$ and $y+1$ individually. Once we have found $y$ and $y+1$, then we can move up the tree until we find the least common ancestor between the nodes of $y$ and $y+1$. The subtree rooted at the least common ancestor will contain all possible values in the range $[y, y+1)$. \\
+
   \begin{lemma}
     The subtree rooted at the least common ancestor of $y$ and $y+1$ in a binary search tree contains all values $x \in [y, y+1)$.
   \end{lemma}
@@ -116,6 +226,7 @@ In phase I:
 \begin{itemize}
   \item Client generates $SK \leftarrow KeyGen(1^\kappa)$ based on security parameter $\kappa$.
   \item Adversary may perform encryptions and other operations in time $poly(\kappa)$.
+  \item Client chooses $b \leftarrow \{0,1\}$ uniformly at random (which the adversary does not know about).
 \end{itemize} 
 
 In phase II, the client and server engage in $poly(\kappa)$ rounds of interaction in which the adversary is adaptive. In each round $i$:
@@ -146,23 +257,32 @@ The adversary shall win the game if its guess is correct $b' = b$ and the sets h
   DCS is IND-CPDA secure. 
 \end{theorem}
 \begin{proof}
-We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sequences of size $\lambda$. \\ \\
-We will show this by induction on the number of repeated elements in either $V_i$ or $W_i$. We shall first consider the base case when there are no repeated elements in $V_i$ or in $W_i$, so that all the elements in $V_i$ are distinct, as well as the elements in $W_i$. In this case, the sequence $v$ can be broken down into $\kappa$ sequences of all distinct elements. This has a clear bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) show that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. This means that the DCS scheme is IND-CPDA secure when there are no repeated elements. \\ \\
-Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure. To complete the proof, we simply need to show that when there are $k+1$ repeated elements, the DCS scheme is still secure. \\ \\
-Let us compare the sets $V_i$ and $W_i$ with $k+1$ repeated elements to the sets with $k$ repeated elements. In the $k+1$ case, there is one extra reptition with a value that has already appeared, on top of the $k$ repetitions that already exist. Now consider the plaintext $x$ which is repeated. The probability that the OPE encoding of $x$ has already appeared in the sequence of elements in the set $V_i$ or $W_i$ is negligible at $O(2^{-\lambda} \kappa)$. Since the OPE encoding is not repeated by the new value $x$, the number of OPE encoding repetitions is at most $k$. However, we have shown that when there are $k$ repeated elements in the sets $V_i$ and $W_i$, then DCS is IND-CPDA secure by the inductive hypothesis. Since the largest number of repeated encodings in this case is $k$, this is the same situation as when there are $k$ repeated elements in the sets $V_i$ and $W_i$. Therefore, when there are $k+1$ repeated elements, DCS is IND-CPDA secure. \\ \\
+We shall show that encrypting $v = \{V_1, V_2, \ldots, V_{\kappa} \}$ and $w = \{W_1, W_2, \ldots, W_{\kappa}\}$ is information-theoretically the same, where $V_i, W_i$ are sequences of size $\lambda$.
+
+We will show this by induction on the number of repeated elements in either $V_i$ or $W_i$. We shall first consider the base case when there are no repeated elements in $V_i$ or in $W_i$, so that all the elements in $V_i$ are distinct, as well as the elements in $W_i$. In this case, the sequence $v$ can be broken down into $\kappa$ sequences of all distinct elements. This has a clear bijection to a sequence of elements $v_{ij}$ of length $\kappa \lambda$, for $i \in \{1, 2, \ldots, \kappa\}$ and $j \in \{1, 2, \ldots, \lambda \}$. Winning this game then becomes equivalent to winning the IND-OCPA security game, since one can think of each $v_{ij}$ and $w_{ij}$ pair as a set of values that the adversary provides the client in each round $i$. Popa et al (2013) show that their scheme, which is equivalent to the Distribution Confidentiality Scheme when there are no reptitions, is IND-OCPA secure. This means that the DCS scheme is IND-CPDA secure when there are no repeated elements.
+
+Now we shall use strong induction and assume that when there are a maximum of $k$ repeated elements in both $V_i$ and $W_i$, the DCS scheme is IND-CPDA secure. To complete the proof, we simply need to show that when there are $k+1$ repeated elements, the DCS scheme is still secure.
+
+Let us compare the sets $V_i$ and $W_i$ with $k+1$ repeated elements to the sets with $k$ repeated elements. In the $k+1$ case, there is one extra reptition with a value that has already appeared, on top of the $k$ repetitions that already exist. Now consider the plaintext $x$ which is repeated. The probability that the OPE encoding of $x$ has already appeared in the sequence of elements in the set $V_i$ or $W_i$ is negligible. Since the OPE encoding is not repeated by the new value $x$, the number of OPE encoding repetitions is at most $k$. However, we have shown that when there are $k$ repeated elements in the sets $V_i$ and $W_i$, then DCS is IND-CPDA secure by the inductive hypothesis. Since the largest number of repeated encodings in this case is $k$, this is the same situation as when there are $k$ repeated elements in the sets $V_i$ and $W_i$. Therefore, when there are $k+1$ repeated elements, DCS is IND-CPDA secure.
 We have therefore shown by induction that DCS is IND-CPDA secure for any number of repeated elements in the sets $V_i$ and $W_i$, which completes the proof that DCS is IND-CPDA secure.
 \end{proof}
 
 \section{Random Tiebreaking Order Preserving Encryption (RTOPE)}
 
-Consider a simple tie-breaking rule on top of the mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not correspond to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability. Note that in this scheme, we will use a randomized encryption scheme which is IND-CCA so that the server cannot tell if two plaintext values are the same. \\ \\
-To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process. \\ \\
+Consider another simple tie-breaking rule on top of the mOPE scheme. When the client inserts a new ciphertext $c^*$ into the server, the client proceeds normally when the ciphertext $c_i$ returned by the server does not get decrypted to a plaintext $p_i$ which is equal to $p^* = Dec(SK, c^*)$. However, if $p_i = p^*$, then the client tells the server to move left or right with uniform probability. Note that in this scheme, we will use a randomized encryption scheme which is IND-CCA so that the server cannot tell if two plaintext values are the same.
+
+To query a ciphertext $c^*$, one needs to make sure to find all possible places where $c^*$ can exist. Thus, whenever the server returns $c_i$ which decrypts to $p_i = p^* = Dec(SK, c^*)$, then one must check both the left and right subtrees of $c_i$ to see if $c^*$ exists. Querying each subtree is done with the  normal Popa et al (2013) process.
+
 This scheme is a simple extension of the mOPE scheme and handles repeated values. In RTOPE, the server cannot tell how many values are repeated, nor what distribution of repeated values looks like.
+
 \subsection{Querying Under RTOPE}
-Under RTOPE, there are multiple variations of querying for some value $x$. First is to query for just one ciphertext whose corresponding plaintext is equal to $x$. The second query type is to query for all ciphertexts whose corresponding plaintext is equal to $x$. \\ \\
-The first case is easy to handle and can be achieved by using the regular query mechanism used by Popa et al (2013) and returning the first ciphertext found which matches. If there are any ciphertexts which can be decrypted to $x$, then the regular binary search tree mechanism will find at least one, which guarantees that this will correctly return one of these ciphertexts. \\ \\
-The second case can be handled by a modified query algorithm. To return all ciphertexts decrypting to $x$, we still need to do a regular query for $x$. Upon finding the first $x$, we append this value to our list of results, and we need to query both the right and left subtrees for $x$ again. Doing this recursively until we reach a leaf will guarantee that we will find all possible places where $x$. \\ \\
-This gaurantee can be given in the following proposition: \\ \\
+
+Under RTOPE, there are multiple variations of querying for some value $x$. First is to query for just one ciphertext whose corresponding plaintext is equal to $x$. The second query type is to query for all ciphertexts whose corresponding plaintext is equal to $x$.
+
+The first case is easy to handle and can be achieved by using the regular query mechanism used by Popa et al (2013) and returning the first ciphertext found which matches. If there are any ciphertexts which can be decrypted to $x$, then the regular binary search tree mechanism will find at least one, which guarantees that this will correctly return one of these ciphertexts.
+
+The second case can be handled by a modified query algorithm. To return all ciphertexts decrypting to $x$, we still need to do a regular query for $x$. Upon finding the first $x$, we append this value to our list of results, and we need to query both the right and left subtrees for $x$ again. Doing this recursively until we reach a leaf will guarantee that we will find all possible places where $x$. This gaurantee can be given in the following proposition: \\ \\
+
   \begin{proposition}
     Let $T$ be a binary search tree and $x$ be a repeated value in the binary search tree. There exists a subtree $T'$ rooted at $x$ which contains all values $x$ in the tree $T$.
   \end{proposition}
@@ -171,12 +291,18 @@ This gaurantee can be given in the following proposition: \\ \\
 We note that there are three cases. First, if $x$ is not repeated (i.e. occurs in the tree only once), then the proposition is trivially true. Second, if $x$ is repeated, and all the repeated values are in the right subtree of the least common ancestor, then one can choose the value of $x$ which has the largest height in the binary search tree. This defines a subtree containing all values of $x$ and which is also rooted at $x$. The same idea follows when all the repeated values of $x$ are in the left subtree. Finally, if the repeated values of $x$ are in both the left and right subtree of the least common ancestor $l$, then we know that $x \leq l$ and $x \geq l$ by the properties of a binary search tree. This implies that $l = x$, which completes the proof.
   \end{proof}
 
-By the above proposition, we can show that as soon as we find the first value of $x$ based on the regular binary search tree query algorithm, then all other values of $x$ will be contained in either the left or right subtree of this node. This implies that we will find all values of $x$ in the tree. \\ \\
-  The runtime of this query is
+By the above proposition, we can show that as soon as we find the first value of $x$ based on the regular binary search tree query algorithm, then all other values of $x$ will be contained in either the left or right subtree of this node. This implies that we will find all values of $x$ in the tree.
+
+The runtime $T(n)$ of this query can found by noting that in the worst case, every element in the tree is repeated so querying for $x$ will require $O(n)$ time. This is an extreme case, however, and it is more likely given by the relation:
+\begin{eqnarray}
+  T(n) = 2 T(n/2) + O(1)
+\end{eqnarray}
+
+Since if a node is found to be the same, then the problem is broken into two smaller problems on the left and right subtrees, which are both of size $O(n/2)$ for a balanced tree. The solution of this recurrence is $O(\log n)$, so one can usually expect a logarithmic running time.
 
   \subsection{Security of RTOPE}
 
-  RTOPE can be proven to be IND-CPDA, just like the DCS scheme. 
+  RTOPE can be proven to be IND-CPDA, just like the DCS scheme.
   \begin{theorem}
     RTOPE is IND-CPDA secure.
   \end{theorem}
