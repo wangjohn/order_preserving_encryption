@@ -101,7 +101,7 @@ Prior work on range query schemes all leak information about the underlying plai
 
 \section{Distribution Confidentiality Scheme}
 
-In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Popa et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comprable in terms of performance.
+In order to solve the problem of leaking the distribution of the plaintext values, we have developed the Distribution Confidentiality Scheme (DCS). This scheme uses Popa et al (2013)'s original mOPE scheme, but adds an additional layer of security. We show that the schemes are comparable in terms of performance.
 
 In essence, the DCS scheme adds random bits to the end of a plaintext so that the ciphertext values are randomized. This will prevent the server from being able to identify the number of times a repeated plaintext value is inserted.
 
@@ -496,6 +496,7 @@ The average number of OPE re-encodings is roughly the same for any number of rep
 We proved that DCS and RTOPE are IND-CPDA secure and introduced the notion of structurally expectation equivalence. We also proved the important theorem that if two OPE schemes are structurally expectation equivalent, then one is IND-CPDA secure if and only if the other is IND-CPDA secure as well. We then showed that DCS and RTOPE do not satisfy this structurally expectation equivalence relationship.
 
 We noted that though the schemes are not structurally expectation equivalent, the number of OPE re-encodings will converege to the same number, given identical inputs. This notion was supported by our experimental results, which we tested on a range of inputs.
+\clearpage
 
 \begin{thebibliography}{9}
 

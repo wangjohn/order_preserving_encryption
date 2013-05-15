@@ -1,0 +1,23 @@
+\contentsline {section}{\numberline {1}Introduction}{3}
+\contentsline {section}{\numberline {2}Mutable Order-Preserving Scheme (mOPE)}{3}
+\contentsline {subsection}{\numberline {2.1}Storage of Data on Client and Server}{4}
+\contentsline {subsection}{\numberline {2.2}Protocol for Maintaining Order on Server}{4}
+\contentsline {subsection}{\numberline {2.3}Handling repeated values}{5}
+\contentsline {subsection}{\numberline {2.4}Related Work}{6}
+\contentsline {section}{\numberline {3}Distribution Confidentiality Scheme}{6}
+\contentsline {subsection}{\numberline {3.1}Description of DCS}{6}
+\contentsline {subsection}{\numberline {3.2}Arbitrarily Small Collision Probability}{7}
+\contentsline {subsection}{\numberline {3.3}Dynamic Version of DCS}{8}
+\contentsline {subsection}{\numberline {3.4}Inserting in DCS}{10}
+\contentsline {subsection}{\numberline {3.5}Querying Under DCS}{10}
+\contentsline {subsection}{\numberline {3.6}Range Queries Under DCS}{11}
+\contentsline {section}{\numberline {4}Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}{11}
+\contentsline {subsection}{\numberline {4.1}Security of DCS}{12}
+\contentsline {section}{\numberline {5}Random Tiebreaking Order Preserving Encryption (RTOPE)}{13}
+\contentsline {subsection}{\numberline {5.1}Querying Under RTOPE}{13}
+\contentsline {subsection}{\numberline {5.2}Security of RTOPE}{14}
+\contentsline {section}{\numberline {6}Relationship Between DCS and RTOPE}{15}
+\contentsline {subsection}{\numberline {6.1}Structural Expectation Equivalence}{15}
+\contentsline {subsection}{\numberline {6.2}Structural Expectation Equivalence of DCS and RTOPE}{16}
+\contentsline {section}{\numberline {7}Experimental Results}{19}
+\contentsline {section}{\numberline {8}Conclusion}{20}
