@@ -1,7 +1,6 @@
 \documentclass[12pt]{article}
 
 %-------Packages---------
-\usepackage{amssymb,amsfonts}
 \usepackage{enumerate}
 \usepackage[margin=0.75in]{geometry}
 \usepackage{rotating}
@@ -9,7 +8,6 @@
 \usepackage{booktabs}
 \usepackage{float}
 \usepackage{listings}
-\usepackage[parfill]{parskip}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
@@ -17,6 +15,8 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\usepackage{parskip}
 
 %--------Meta Data: Fill in your info------
 \title{
@@ -30,7 +30,9 @@
 
 \maketitle
 
-\abstract{Order Preserving Encryption (OPE) schemes have been heavily studied in the cryptography literature because of their potential application to database design. Unfortunately, few schemes have been able to achieve provable security and leak the minimum amount of information possible. Until Popa et al (2013), no OPE scheme achieved IND-OCPA security. However, even Popa et al's design potentially leaks the distribution of repeated ciphertexts. This paper provides two schemes which are both IND-OCPA secure and do not leak the distribution of ciphertexts. We introduce the notion of IND-CPDA security, and show that both of our schemes satisfy the notion. Finally, we provide experimental results on the effectiveness of these two schemes in practice.}
+\begin{abstract}
+  Order Preserving Encryption (OPE) schemes have been heavily studied in the cryptography literature because of their potential application to database design. Unfortunately, few schemes have been able to achieve provable security and leak the minimum amount of information possible. Until Popa et al (2013), no OPE scheme achieved IND-OCPA security. However, even Popa et al's design potentially leaks the distribution of repeated ciphertexts. This paper provides two schemes which are both IND-OCPA secure and do not leak the distribution of ciphertexts. We introduce the notion of IND-CPDA security, and show that both of our schemes satisfy the notion. Finally, we provide experimental results on the effectiveness of these two schemes in practice.
+\end{abstract}
 
 \newpage
 
@@ -115,7 +117,7 @@ In this scheme, the probability of any ciphertexts being the same is small, and 
 
 Notice that this is exactly the birthday paradox problem since we must solve for the probability that any collision occurs. There are $2^\rho$ possible random numbers to be chosen. Now suppose that some value $x$ has $R(x)$ repetitions at the server, each with a plaintext value of $x'_i = x + r_i$ for the $i$th repetition. The probability of a collision and therefore a repeated ciphertext is just one minus the probability of no collisions:
 \begin{eqnarray}
-  Pr[\textrm{Ciphertext Collision of } Encode(SK, x)] = \prod_{i=1}^{R(x)} \left(1 - \frac{i}{2^{\rho}} \right)
+  Pr[\textrm{Ciphertext Collision of } Encode(SK, x)] = 1 - \prod_{i=1}^{R(x)} \left(1 - \frac{i}{2^{\rho}} \right)
 \end{eqnarray}
 
 The above expression is obtained because each newly chosen value $r_{i+1}$ can collide with $i$ previous values, out of the $2^{\rho}$ possible choices of $r_{i+1}$. Moreover, we can show that as $\rho \to \infty$, we obtain perfect collision protection. \\
@@ -138,13 +140,23 @@ The above expression is obtained because each newly chosen value $r_{i+1}$ can c
   This shows that the collision probability approaches 0.
 \end{proof}
 
-Moreover, one can find an upper bound on the collision parameter $\rho$ one needs in order to not have collisions by using the upper bound of $(1 - R(x)/2^{\rho})^{R(x)}$ on the probability of no collisions. Setting this equal to one, we obtain:
+Moreover, one can find an lower bound on the collision parameter $\rho$ that is needed. We can set the probability of no collisions to 0 and see when items will always collide. We obtain:
 \begin{eqnarray}
-  \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)} &=& 1 \\
+  \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)} &=& 0 \\
                                             \rho &=& \log_2 R(x)
 \end{eqnarray}
 
-Thus, choosing the correct $\rho$ to use is as simple as taking $y = \max_x R(x)$ over all input plaintext values $x$, and setting $\rho = \log_2 y$. Unfortunately, it may not be possible to predict $y$ ahead of time before insertions, and in any case, it would be nice to have a dynamic way of changing $\rho$ to the specifications of the problem.
+Thus, one must choose $\rho > \max_x \log_2 R(x)$ to have a valid $\rho$. Anything less will cause collisions with certainty. We can also provide a bound on how certain you are of not having a collision. If one would like to limit the probability of having a collision to $k$. We have:
+\begin{eqnarray}
+  \left(1 - \frac{R(x)}{2^{\rho}} \right)^{R(x)} \leq k
+\end{eqnarray}
+
+Solving for $\rho$, we get:
+\begin{eqnarray}
+   \rho \geq - \log_2 \left( \frac{1 - k^{1/R(x)}}{R(x)} \right)
+\end{eqnarray}
+
+Thus, choosing the correct $\rho$ can be achieved by taking $y = \max_x R(x)$ over all input plaintext values $x$, and setting $\rho > - \log_2 \left( \frac{1 - k^{1/y}}{y} \right)$ for some confidence level $k$. Choose $k$ closer to $1$ will result in larger $\rho$, but will give a higher probability of no collisions. Unfortunately, it may not be possible to predict $y$ ahead of time before insertions, and in any case, it would be nice to have a dynamic way of changing $\rho$ to the specifications of the problem.
 
 \subsection{Dynamic Version of DCS}
 
@@ -232,25 +244,28 @@ This process is correct because we continue checking subtrees until we find the 
 
   To perform range queries under the DCS scheme, one simply needs to perform a range query on the underlying binary search tree. If one attempts to query for values $x \in [y, z]$, then we simply perform a range query for the underlying plaintexts in the binary search tree in the range $[y, z+1)$. We use the same range query mechanism as in the previous section, making sure to only output values that are inside in the interval $[y, z+1)$.
 \section{Indistinguishability Under Chosen Plaintext Distribution Attack (IND-CPDA)}
-This security definition consists of two phases of interaction between the adversary and the challenger. \\ \\
-In phase I:
+
+This security definition consists of two phases of interaction between the adversary and the challenger. In phase I:
+
 \begin{itemize}
   \item Client generates $SK \leftarrow KeyGen(1^\kappa)$ based on security parameter $\kappa$.
   \item Adversary may perform encryptions and other operations in time $poly(\kappa)$.
   \item Client chooses $b \leftarrow \{0,1\}$ uniformly at random (which the adversary does not know about).
-\end{itemize} 
+\end{itemize}
 
 In phase II, the client and server engage in $poly(\kappa)$ rounds of interaction in which the adversary is adaptive. In each round $i$:
+
 \begin{itemize}
   \item Adversary sends sequences $V_i^0, V_i^1 \in D^{\lambda}$ to the client each of size $\lambda$, where $\lambda$ is a fixed value, and $V_i = \{ v_{ij} \}_i^{\lambda}$ where $v_{ij}$ is the $j$th value chosen for round $i$.
   \item The client leads the interaction for the encryption algorithm on inputs $SK$ and $V_i^b$ with the server, with the adversary observing all the state at the server.
-\end{itemize} 
+\end{itemize}
 
 In phase III:
+
 \begin{itemize}
   \item Adversary obtains $poly(\lambda, \kappa)$ time to compute.
   \item Adversary outputs $b'$ as its guess for $b$. 
-\end{itemize} 
+\end{itemize}
 
 The adversary shall win the game if its guess is correct $b' = b$ and the sets have the same order relations (namely that $v_{ij}^0 < v_{ik}^0 \Leftrightarrow v_{ij}^1 < v_{ik}^1$). 
 
@@ -388,10 +403,10 @@ We shall drop the $x$ for convenience and commonly refer to moves as $m_i$. We s
   \end{eqnarray}
 
 Here $p_i$ is the underlying plaintext value of the node at the $i$th move. We shall proceed to show that the two schemes do not produce the same expected tree. \\
-\begin{theorem}
+\begin{proposition}
     DCS and RTOPE are not structurally expectation equivalent.
-  \end{theorem}
-  \begin{proof}
+\end{proposition}
+\begin{proof}
 We shall prove this theorem by examining a sequence of moves when looking at the insertion of a repeated value $x$. In DCS, to move right so that $m_i = 1$, one must have $p_i < x + r$. To move left, one must have $p_i > x + r$. Although there exists a sequence of moves from the root to a leaf of the tree which includes every node in the tree, we need only examine the nodes which have a plaintext value equal to $x$ (before the addition of the random bit). This is because the traversal of DCS and RTOPE is the same for nodes which are not repeated (they share the normal binary tree traversal rule). Thus, we know that the moves in these cases will be equivalent and the probability of making the moves on non-repeated nodes will be equal.
 
 Thus, we can reduce our problem to considering a sequence of moves \{$m_i\}_{i=1}^k$ on the plaintext values which are equal to $x$. By the propsition we proved above, this sequence of moves will be rooted at a ciphertext which is an encrypted value of $x$. Making any sequence of moves on repeated values in RTOPE will have probability $2^{-k}$ where $k$ is the number of repeated value in the sequence down the tree. This is becase one moves left or right with probability $\frac{1}{2}$.
@@ -428,7 +443,7 @@ The above is the probability that $r^*$ falls between the $j$th and $j+1$st valu
     \end{figure}
 
   We have therefore shown that DCS and RTOPE are not structurally expectation equivalent.
-  \end{proof}
+\end{proof}
 
 \section{Experimental Results}
 
